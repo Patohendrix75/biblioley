@@ -1,211 +1,214 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABONO POR ARRESTO DOMICILIARIO NOCTURNO</title>
-    <style>
-        :root {
-            --primary-color: #4361ee;
-            --primary-hover: #3a56d4;
-            --text-color: #333;
-            --bg-color: #f8f9fa;
-            --card-bg: #ffffff;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ABONO POR ARRESTO DOMICILIARIO NOCTURNO</title>
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-hover: #3a56d4;
+      --text-color: #333;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
 
-        body {
-            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
+    body {
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
 
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-        }
+    h1 {
+      color: var(--primary-color);
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
 
-        .container {
-            background-color: var(--card-bg);
-            padding: 2rem;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
+    .container {
+      background-color: var(--card-bg);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
 
-        input {
-            width: 100%;
-            padding: 0.8rem;
-            font-size: 1rem;
-            border: 1px solid #ced4da;
-            border-radius: var(--border-radius);
-            box-sizing: border-box;
-            transition: var(--transition);
-        }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: var(--border-radius);
+      box-sizing: border-box;
+      transition: var(--transition);
+    }
 
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.25);
-        }
+    input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.25);
+    }
 
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            width: 100%;
-            transition: var(--transition);
-        }
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      width: 100%;
+      transition: var(--transition);
+    }
 
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-        }
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+    }
 
-        .result {
-            margin-top: 1.5rem;
-            padding: 1.5rem;
-            background-color: #e9f5ff;
-            border: 1px solid #b8daff;
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            text-align: center;
-            display: none;
-        }
+    .result {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background-color: #e9f5ff;
+      border: 1px solid #b8daff;
+      border-radius: var(--border-radius);
+      font-size: 1.1rem;
+      text-align: center;
+      display: none;
+    }
 
-        .result.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
+    .result.active {
+      display: block;
+      animation: fadeIn 0.5s;
+    }
 
-        .abono {
-            margin-top: 1rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            font-size: 1.3rem;
-        }
+    .abono {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      font-size: 1.3rem;
+    }
 
-        .error {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border-color: #f5c6cb;
-        }
+    .error {
+      color: #dc3545;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-        }
-    </style>
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>ABONO POR ARRESTO DOMICILIARIO NOCTURNO</h1>
-    <div class="container">
-        <div class="form-group">
-            <label for="startDate">Primer día de Arresto:</label>
-            <input type="date" id="startDate" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="endDate">Último día de Arresto:</label>
-            <input type="date" id="endDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="nonComplianceDays">Días de Incumplimiento:</label>
-            <input type="number" id="nonComplianceDays" min="0" value="0" required>
-        </div>
-        
-        <button id="calculateBtn">Calcular días y abono</button>
-        
-        <div class="result" id="result"></div>
+  <h1>ABONO POR ARRESTO DOMICILIARIO NOCTURNO</h1>
+  <div class="container">
+    <div class="form-group">
+      <label for="startDate">Primer día de Arresto:</label>
+      <input type="date" id="startDate" required>
     </div>
+    <div class="form-group">
+      <label for="endDate">Último día de Arresto:</label>
+      <input type="date" id="endDate" required>
+    </div>
+    <div class="form-group">
+      <label for="nonComplianceDays">Días de Incumplimiento:</label>
+      <input type="number" id="nonComplianceDays" min="0" value="0" required>
+    </div>
+    <button id="calculateBtn">Calcular días y abono</button>
+    <div class="result" id="result"></div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const nonComplianceDaysInput = document.getElementById('nonComplianceDays');
-            const calculateBtn = document.getElementById('calculateBtn');
-            const resultDiv = document.getElementById('result');
-            
-            // Inicializar con la fecha de hoy
-            const todayStr = new Date().toISOString().substr(0, 10);
-            startDateInput.value = todayStr;
-            endDateInput.value = todayStr;
-            
-            calculateBtn.addEventListener('click', calculateDays);
-            [startDateInput, endDateInput, nonComplianceDaysInput].forEach(inp =>
-                inp.addEventListener('keypress', e => { if (e.key === 'Enter') calculateDays(); })
-            );
-            
-            function calculateDays() {
-                const start = new Date(startDateInput.value);
-                const end = new Date(endDateInput.value);
-                const nonComp = parseInt(nonComplianceDaysInput.value) || 0;
-                resultDiv.classList.remove('active', 'error');
-                
-                if (!startDateInput.value || !endDateInput.value) {
-                    return showError('Por favor, ingrese ambas fechas.');
-                }
-                if (nonComp < 0) {
-                    return showError('Los días de incumplimiento no pueden ser negativos.');
-                }
-                
-                const diffTime = end - start;
-                const totalDays = Math.floor(diffTime / (1000 * 3600 * 24)) + 1;
-                if (totalDays <= 0) {
-                    return showError('La fecha final debe ser igual o posterior a la inicial.');
-                }
-                
-                const effective = totalDays - nonComp;
-                if (effective < 0) {
-                    return showError('Los días de incumplimiento superan el período total.');
-                }
-                
-                const abono = (effective * 8) / 12;
-                
-                resultDiv.innerHTML = `
-                    <p>Período total: ${totalDays} día${totalDays !== 1 ? 's' : ''}</p>
-                    <p>Días efectivos de Arresto Nocturno: ${effective}</p>
-                    <div class="abono">DÍAS DE ABONO: ${abono.toFixed(2)}</div>
-                `;
-                resultDiv.classList.add('active');
-            }
-            
-            function showError(msg) {
-                resultDiv.textContent = msg;
-                resultDiv.classList.add('error', 'active');
-            }
+  <script>
+    (function initCalculadora() {
+      const startDateInput       = document.getElementById('startDate');
+      const endDateInput         = document.getElementById('endDate');
+      const nonComplianceInput   = document.getElementById('nonComplianceDays');
+      const calculateBtn         = document.getElementById('calculateBtn');
+      const resultDiv            = document.getElementById('result');
+
+      // Inicializar con fecha de hoy
+      const todayStr = new Date().toISOString().substr(0,10);
+      startDateInput.value      = todayStr;
+      endDateInput.value        = todayStr;
+
+      // Bindear eventos
+      calculateBtn.addEventListener('click', calculateDays);
+      [startDateInput, endDateInput, nonComplianceInput].forEach(input => {
+        input.addEventListener('keypress', e => {
+          if (e.key === 'Enter') calculateDays();
         });
-    </script>
+      });
+
+      function calculateDays() {
+        // Reset classes
+        resultDiv.classList.remove('active', 'error');
+        resultDiv.textContent = '';
+
+        const startVal = startDateInput.value;
+        const endVal   = endDateInput.value;
+        const nonComp  = parseInt(nonComplianceInput.value) || 0;
+
+        if (!startVal || !endVal) {
+          return showError('Por favor, ingrese ambas fechas.');
+        }
+        if (nonComp < 0) {
+          return showError('Los días de incumplimiento no pueden ser negativos.');
+        }
+
+        const start = new Date(startVal);
+        const end   = new Date(endVal);
+        const diffTime  = end - start;
+        const totalDays = Math.floor(diffTime / (1000 * 3600 * 24)) + 1;
+
+        if (totalDays <= 0) {
+          return showError('La fecha final debe ser igual o posterior a la inicial.');
+        }
+        const effective = totalDays - nonComp;
+        if (effective < 0) {
+          return showError('Los días de incumplimiento superan el período total.');
+        }
+
+        const abono = (effective * 8) / 12;
+        resultDiv.innerHTML = `
+          <p>Período total: ${totalDays} día${totalDays !== 1 ? 's' : ''}</p>
+          <p>Días efectivos de arresto nocturno: ${effective}</p>
+          <div class="abono">DÍAS DE ABONO: ${abono.toFixed(2)}</div>
+        `;
+        resultDiv.classList.add('active');
+      }
+
+      function showError(msg) {
+        resultDiv.textContent = msg;
+        resultDiv.classList.add('error', 'active');
+      }
+    })();
+  </script>
 </body>
 </html>
