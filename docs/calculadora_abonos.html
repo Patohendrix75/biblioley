@@ -151,84 +151,58 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Referencias a elementos DOM
             const startDateInput = document.getElementById('startDate');
             const endDateInput = document.getElementById('endDate');
             const nonComplianceDaysInput = document.getElementById('nonComplianceDays');
             const calculateBtn = document.getElementById('calculateBtn');
             const resultDiv = document.getElementById('result');
             
-            // Establecer fecha actual por defecto
-            const today = new Date();
-            const formattedDate = today.toISOString().substr(0, 10);
-            startDateInput.value = formattedDate;
-            endDateInput.value = formattedDate;
+            // Inicializar con la fecha de hoy
+            const todayStr = new Date().toISOString().substr(0, 10);
+            startDateInput.value = todayStr;
+            endDateInput.value = todayStr;
             
-            // Añadir evento al botón
             calculateBtn.addEventListener('click', calculateDays);
-            
-            // También calcular cuando se presiona Enter
-            [startDateInput, endDateInput, nonComplianceDaysInput].forEach(input => {
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        calculateDays();
-                    }
-                });
-            });
+            [startDateInput, endDateInput, nonComplianceDaysInput].forEach(inp =>
+                inp.addEventListener('keypress', e => { if (e.key === 'Enter') calculateDays(); })
+            );
             
             function calculateDays() {
-                try {
-                    const startDate = new Date(startDateInput.value);
-                    const endDate = new Date(endDateInput.value);
-                    const nonComplianceDays = parseInt(nonComplianceDaysInput.value) || 0;
-                    
-                    // Validaciones
-                    if (!startDateInput.value || !endDateInput.value) {
-                        showError('Por favor, ingrese ambas fechas.');
-                        return;
-                    }
-                    
-                    if (nonComplianceDays < 0) {
-                        showError('Los días de incumplimiento no pueden ser negativos.');
-                        return;
-                    }
-                    
-                    // Calcular diferencia de días (incluyendo el día inicial y final)
-                    const timeDiff = endDate - startDate;
-                    const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24)) + 1;
-                    
-                    if (daysDiff <= 0) {
-                        showError('La fecha final debe ser igual o posterior a la fecha inicial.');
-                        return;
-                    }
-                    
-                    // Días efectivos de arresto
-                    const effectiveDays = daysDiff - nonComplianceDays;
-                    
-                    if (effectiveDays < 0) {
-                        showError('Los días de incumplimiento no pueden ser mayores que el período total de arresto.');
-                        return;
-                    }
-                    
-                    // Cálculo del abono (8 horas por día / 12 horas = 2/3)
-                    const formulaResult = (effectiveDays * 8) / 12;
-                    
-                    // Mostrar resultados
-                    resultDiv.innerHTML = `
-                        <p>Período total: ${daysDiff} día${daysDiff !== 1 ? 's' : ''}</p>
-                        <p>Días efectivos de Arresto Nocturno: ${effectiveDays}</p>
-                        <div class="abono">DÍAS DE ABONO: ${formulaResult.toFixed(2)}</div>
-                    `;
-                    resultDiv.classList.remove('error');
-                    resultDiv.classList.add('active');
-                    
-                } catch (error) {
-                    showError('Ocurrió un error al calcular. Por favor, revise los datos ingresados.');
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+                const nonComp = parseInt(nonComplianceDaysInput.value) || 0;
+                resultDiv.classList.remove('active', 'error');
+                
+                if (!startDateInput.value || !endDateInput.value) {
+                    return showError('Por favor, ingrese ambas fechas.');
                 }
+                if (nonComp < 0) {
+                    return showError('Los días de incumplimiento no pueden ser negativos.');
+                }
+                
+                const diffTime = end - start;
+                const totalDays = Math.floor(diffTime / (1000 * 3600 * 24)) + 1;
+                if (totalDays <= 0) {
+                    return showError('La fecha final debe ser igual o posterior a la inicial.');
+                }
+                
+                const effective = totalDays - nonComp;
+                if (effective < 0) {
+                    return showError('Los días de incumplimiento superan el período total.');
+                }
+                
+                const abono = (effective * 8) / 12;
+                
+                resultDiv.innerHTML = `
+                    <p>Período total: ${totalDays} día${totalDays !== 1 ? 's' : ''}</p>
+                    <p>Días efectivos de Arresto Nocturno: ${effective}</p>
+                    <div class="abono">DÍAS DE ABONO: ${abono.toFixed(2)}</div>
+                `;
+                resultDiv.classList.add('active');
             }
             
-            function showError(message) {
-                resultDiv.textContent = message;
+            function showError(msg) {
+                resultDiv.textContent = msg;
                 resultDiv.classList.add('error', 'active');
             }
         });
