@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABONO POR ARRESTO DOMICILIARIO NOCTURNO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 2em; /* Agranda la fuente al 100% */
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 20px; /* Agranda la fuente y el tamaño del input al 100% */
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            font-size: 1.2em; /* Agranda la fuente al 100% */
+            text-align: center;
+        }
+        .footer {
+            font-size: 0.8em;
+            text-align: right;
+            margin-top: 20px;
+            color: #555;
+        }
+        .abono {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ABONO POR ARRESTO DOMICILIARIO NOCTURNO</h1>
+    <div class="container">
+        <label for="startDate">Primer dia de Arresto:</label>
+        <input type="date" id="startDate" required>
+        
+        <label for="endDate">Ultimo dia Arresto:</label>
+        <input type="date" id="endDate" required>
+
+        <label for="nonComplianceDays">Días de Incumplimiento:</label>
+        <input type="number" id="nonComplianceDays" min="0" value="0" required>
+        
+        <button onclick="calculateDays()">Calcular días y abono</button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <div class="footer">Creado por JPAL. Mayo, 2024</div>
+
+    <script>
+        function calculateDays() {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+            const nonComplianceDays = parseInt(document.getElementById('nonComplianceDays').value);
+            const resultDiv = document.getElementById('result');
+
+            if (!startDate || !endDate || isNaN(nonComplianceDays)) {
+                resultDiv.textContent = 'Por favor, ingrese ambas fechas y los días de incumplimiento.';
+                return;
+            }
+
+            const timeDiff = endDate - startDate;
+            const daysDiff = timeDiff / (1000 * 3600 * 24) + 1 - nonComplianceDays;
+
+            if (daysDiff < 0) {
+                resultDiv.textContent = 'La fecha de fin debe ser posterior a la fecha de inicio, y los días de incumplimiento no deben exceder el rango de días.';
+                return;
+            }
+
+            const formulaResult = (daysDiff * 8) / 12;
+
+            resultDiv.innerHTML = `Días efectivos de Arresto Nocturno: ${daysDiff}<br>
+                                   <div class="abono">DIAS DE ABONO: ${formulaResult.toFixed(2)}</div>`;
+        }
+    </script>
+
+</body>
+</html>
