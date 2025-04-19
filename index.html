@@ -405,8 +405,8 @@
       { file: 'documento8.html', title: 'LEY RPA (Diferida)', icon: 'fa-solid fa-child-reaching' },
       { file: 'documento9.html', title: 'LEY DE VIOLENCIA EN LOS ESTADIOS', icon: 'fa-solid fa-futbol' },
       { file: 'documento10.html', title: 'LEY DE TRANSITO', icon: 'fa-solid fa-car' },
-      { file: 'documento11.html', title: 'LEY ORGANICA DEL MINISTERIO PUBLICO', icon: 'fa-solid fa-building-columns' }
-          { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
+      { file: 'documento11.html', title: 'LEY ORGANICA DEL MINISTERIO PUBLICO', icon: 'fa-solid fa-building-columns' },
+      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' }
     ];
 
     // Elementos DOM
@@ -535,8 +535,7 @@
       
       const rx = new RegExp(`(${escapeRx(term)})`, 'gi');
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-      const nodes = [      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
-    ];
+      const nodes = [];
       
       while (walker.nextNode()) nodes.push(walker.currentNode);
       
@@ -597,8 +596,7 @@
       lastTerm = term;
       viewer.innerHTML = viewer.dataset.original;
       highlightTerm(viewer, term);
-      highlights = [...viewer.querySelectorAll('.highlight')      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
-    ];
+      highlights = [...viewer.querySelectorAll('.highlight')];
       
       // Mostrar panel de resultados si hay coincidencias
       if (highlights.length) {
@@ -640,8 +638,7 @@
 
     // Restablecer búsqueda
     function resetSearch() {
-      highlights = [      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
-    ];
+      highlights = [];
       currentHit = -1;
       lastTerm = '';
       searchResults.style.display = 'none';
