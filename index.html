@@ -469,6 +469,20 @@
         }
         
         viewer.innerHTML = html;
+        // --- Inyectar scripts inline para que los <script> cargados se ejecuten ---
+        viewer.dataset.original = viewer.innerHTML;
+        viewer.querySelectorAll('script').forEach(oldScript => {
+          const newScript = document.createElement('script');
+          if (oldScript.src) {
+            newScript.src = oldScript.src;
+          } else {
+            newScript.textContent = oldScript.textContent;
+          }
+          document.body.appendChild(newScript);
+          oldScript.remove();
+        });
+        // -------------------------------------------------------------
+
         viewer.dataset.original = viewer.innerHTML;
         
         // Aplicar resaltado de sintaxis
