@@ -46,6 +46,11 @@
       padding: 1rem;
       z-index: 100;
     }
+    
+    /* Versión compacta del header para el modo de documento */
+    header.compact {
+      padding: 0.5rem;
+    }
 
     .title-bar {
       display: flex;
@@ -58,6 +63,11 @@
       margin: 0;
       flex: 1;
     }
+    
+    /* Título más pequeño en el modo documento */
+    header.compact .title-bar h1 {
+      font-size: 1.1rem;
+    }
 
     .search-bar {
       background: #fff;
@@ -67,6 +77,11 @@
       display: flex;
       align-items: center;
       box-shadow: var(--shadow);
+    }
+    
+    /* Ocultar búsqueda en modo documento */
+    header.compact .search-bar {
+      display: none;
     }
 
     .search-bar input {
@@ -91,6 +106,11 @@
       background: #e8ebf0;
       border-bottom: 1px solid rgba(0,0,0,0.1);
     }
+    
+    /* Barra de herramientas compacta para modo documento */
+    .toolbar.compact {
+      padding: 0.25rem 0.75rem;
+    }
 
     .toolbar.hidden {
       display: none;
@@ -108,6 +128,13 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       color: var(--primary);
       font-size: 1.1rem;
+    }
+    
+    /* Botones más pequeños en modo documento */
+    .toolbar.compact .btn {
+      width: 36px;
+      height: 36px;
+      font-size: 0.9rem;
     }
 
     .btn:active {
@@ -128,6 +155,11 @@
       flex: 1;
       overflow-y: auto;
       padding: 0.75rem;
+    }
+    
+    /* Contenedor sin padding superior en modo documento */
+    .container.doc-mode {
+      padding-top: 0;
     }
 
     .doc-grid {
@@ -239,6 +271,17 @@
       align-items: center;
       justify-content: center;
     }
+    
+    /* Título del documento en la barra superior */
+    .doc-header-title {
+      margin-left: 0.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
 
     @media (prefers-color-scheme: dark) {
       :root {
@@ -279,9 +322,10 @@
   </style>
 </head>
 <body>
-  <header>
+  <header id="main-header">
     <div class="title-bar">
       <h1>Biblioteca Jurídica</h1>
+      <span id="doc-title-header" class="doc-header-title"></span>
     </div>
     <div class="search-bar">
       <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -314,7 +358,7 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" id="main-container">
     <div class="doc-grid" id="docList"></div>
     <div id="viewer" style="display:none;"></div>
   </div>
@@ -349,6 +393,9 @@
     const docToolbar = document.getElementById('doc-toolbar');
     const resultCounter = document.getElementById('result-counter');
     const searchResults = document.querySelector('.search-results');
+    const mainHeader = document.getElementById('main-header');
+    const mainContainer = document.getElementById('main-container');
+    const docTitleHeader = document.getElementById('doc-title-header');
     
     // Variables para búsqueda
     let highlights = [], currentHit = -1, lastTerm = '';
@@ -418,6 +465,14 @@
       // Cambiar barras de herramientas
       viewToolbar.classList.add('hidden');
       docToolbar.classList.remove('hidden');
+      docToolbar.classList.add('compact');
+      
+      // Cambiar el aspecto del header para modo documento
+      mainHeader.classList.add('compact');
+      mainContainer.classList.add('doc-mode');
+      
+      // Mostrar título del documento en el header
+      docTitleHeader.textContent = title;
       
       // Cargar documento
       loadDocument(file, title);
@@ -434,7 +489,15 @@
       
       // Cambiar barras de herramientas
       docToolbar.classList.add('hidden');
+      docToolbar.classList.remove('compact');
       viewToolbar.classList.remove('hidden');
+      
+      // Restaurar header y container
+      mainHeader.classList.remove('compact');
+      mainContainer.classList.remove('doc-mode');
+      
+      // Limpiar título del documento en header
+      docTitleHeader.textContent = '';
       
       // Limpiar búsqueda
       searchInput.value = '';
