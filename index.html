@@ -320,22 +320,21 @@
       }
     }
   
-@media screen and (max-width: 480px) {
-  #viewer {
-    padding: 0.5rem !important;
-    font-size: 0.95rem;
-  }
+    @media screen and (max-width: 480px) {
+      #viewer {
+        padding: 0.5rem !important;
+        font-size: 0.95rem;
+      }
 
-  .toolbar.compact .btn {
-    width: 28px;
-    height: 28px;
-  }
+      .toolbar.compact .btn {
+        width: 28px;
+        height: 28px;
+      }
 
-  .doc-header-title {
-    font-size: 0.8rem;
-  }
-}
-
+      .doc-header-title {
+        font-size: 0.8rem;
+      }
+    }
   
     .doc-item.calculadora {
       border-top: 4px solid #2a5d68;
@@ -359,7 +358,7 @@
   <div class="toolbar" id="view-toolbar">
     <div class="view-btns">
       <button class="btn active" id="grid-view-btn" title="Vista en cuadrícula">
-        <i class="fa-solid fa-grid-2"></i>
+        <i class="fa-solid fa-table-cells"></i>
       </button>
       <button class="btn" id="list-view-btn" title="Vista en lista">
         <i class="fa-solid fa-list"></i>
@@ -394,6 +393,7 @@
   </div>
 
   <script>
+    // Definición de documentos con sus propiedades
     const docs = [
       { file: 'documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
       { file: 'documento2.html', title: 'CÓDIGO PROCESAL PENAL', icon: 'fa-solid fa-scale-balanced' },
@@ -459,8 +459,11 @@
         } else {
           const p = new DOMParser();
           const docHtml = p.parseFromString(txt, 'text/html');
-          docHtml.head.querySelectorAll('style,link').forEach(e => e.remove());
-          html = docHtml.body.innerHTML;
+          // Solo eliminamos estilos y enlaces si existen
+          if (docHtml.head) {
+            docHtml.head.querySelectorAll('style,link').forEach(e => e.remove());
+          }
+          html = docHtml.body ? docHtml.body.innerHTML : txt;
         }
         
         viewer.innerHTML = html;
@@ -684,7 +687,9 @@
     document.getElementById('close-search').addEventListener('click', () => {
       searchInput.value = '';
       resetSearch();
-      viewer.innerHTML = viewer.dataset.original;
+      if (viewer.dataset.original) {
+        viewer.innerHTML = viewer.dataset.original;
+      }
     });
     
     // Búsqueda en tiempo real
@@ -704,7 +709,6 @@
     // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
       buildDocList();
-      goHome();
       
       // Restaurar modo de vista
       const savedView = localStorage.getItem('viewMode');
@@ -712,11 +716,14 @@
         toggleView('list');
       }
       
-      // Registrar Service Worker
+      // Registrar Service Worker si está disponible
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js')
           .catch(err => console.error('Error al registrar Service Worker:', err));
       }
+
+      // Asegurarse de que empezamos en la vista de inicio
+      goHome();
     });
   </script>
 </body>
