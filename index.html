@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <link href="favicon.ico" rel="icon" type="image/x-icon"/>
+  <link href="apple-touch-icon.png" rel="apple-touch-icon"/>
+  <meta content="yes" name="apple-mobile-web-app-capable"/>
+  <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+  <meta content="#1f334d" name="theme-color"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Biblioteca Jurídica – ANF</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1f334d;
+      --primary-light: #2c4a6e;
+      --accent: #e63946;
+      --bg: #f5f7fa;
+      --text: #333;
+      --text-light: #666;
+      --card-bg: #fff;
+      --radius: 12px;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease;
+      --border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    #banner {
+      height: 42px;
+      width: auto;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    #toolbar {
+      display: none;
+      gap: 0.75rem;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    #toolbar button {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.5rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    #toolbar button:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 500px;
+      margin-left: auto;
+    }
+
+    #search {
+      width: 100%;
+      border: none;
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    #search:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .main-content {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #docList {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.5rem;
+      transition: var(--transition);
+    }
+
+    .doc-item {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+      border: var(--border);
+      aspect-ratio: 3/4;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .doc-item:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: var(--primary);
+      transition: var(--transition);
+    }
+
+    .doc-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .doc-item:hover:before {
+      background: var(--accent);
+    }
+
+    .doc-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+      transition: var(--transition);
+    }
+
+    .doc-item:hover .doc-icon {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .doc-title {
+      text-align: center;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    #viewer {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      display: none;
+      line-height: 1.6;
+      border: var(--border);
+    }
+
+    #viewer h1, #viewer h2 {
+      color: var(--primary);
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    .highlight {
+      background: #ffeeba;
+      color: #000;
+      border-radius: 4px;
+      padding: 0 4px;
+      box-shadow: 0 0 0 2px rgba(255, 235, 59, 0.3);
+    }
+
+    .view-controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .view-btn {
+      background: var(--card-bg);
+      border: var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .view-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .list-view {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem;
+    }
+
+    .list-view .doc-item {
+      flex-direction: row;
+      aspect-ratio: unset;
+      padding: 0.75rem 1.5rem;
+      justify-content: flex-start;
+      gap: 1rem;
+    }
+
+    .list-view .doc-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0;
+    }
+
+    .list-view .doc-item:before {
+      width: 8px;
+      height: 100%;
+    }
+
+    /* Modo oscuro */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #2c4a6e;
+        --primary-light: #3a617e;
+        --accent: #e63946;
+        --bg: #121212;
+        --text: #eee;
+        --text-light: #aaa;
+        --card-bg: #1e1e1e;
+        --border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      #search {
+        background: #292929;
+        color: #eee;
+      }
+
+      .highlight {
+        background: #6d5a00;
+        color: #fff;
+        box-shadow: 0 0 0 2px rgba(109, 90, 0, 0.3);
+      }
+
+      #viewer h1, #viewer h2 {
+        border-bottom-color: #333;
+      }
+    }
+
+    /* Ajustes móviles */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-wrap: wrap;
+      }
+
+      #banner {
+        height: 32px;
+      }
+
+      h1 {
+        font-size: 1.1rem;
+      }
+
+      #toolbar {
+        width: 100%;
+        margin-top: 1rem;
+        justify-content: space-between;
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      #docList {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+      }
+
+      .doc-icon {
+        font-size: 2rem;
+      }
+
+      .doc-title {
+        font-size: 0.9rem;
+      }
+
+      #viewer {
+        padding: 1rem;
+      }
+
+      .search-container {
+        width: 100%;
+        margin-top: 0.75rem;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #banner {
+        display: none;
+      }
+
+      #docList {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .doc-item {
+        padding: 1rem;
+      }
+    }
+
+    /* Estilos para la navegación por resultados de búsqueda */
+    .search-results {
+      background: var(--primary);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius);
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      position: fixed;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: var(--shadow);
+      z-index: 100;
+    }
+
+    .search-results button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .search-results button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Animaciones */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <img alt="Banner ANF" id="banner" src="banner.jpg"/>
+      <h1>Biblioteca Jurídica</h1>
+      
+      <div id="toolbar">
+        <button id="btn-home" title="Volver al inicio"><i class="fa-solid fa-house"></i></button>
+        <button id="btn-font-decrease" title="Disminuir tamaño de texto"><i class="fa-solid fa-text-height fa-sm"></i></button>
+        <button id="btn-font-increase" title="Aumentar tamaño de texto"><i class="fa-solid fa-text-height"></i></button>
+      </div>
+
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input id="search" placeholder="Buscar por título o contenido..."/>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="view-controls">
+      <button class="view-btn active" id="grid-view-btn" title="Vista en cuadrícula">
+        <i class="fa-solid fa-grip"></i>
+      </button>
+      <button class="view-btn" id="list-view-btn" title="Vista en lista">
+        <i class="fa-solid fa-list"></i>
+      </button>
+    </div>
+    
+    <div class="grid-view" id="docList"></div>
+    <div id="viewer"></div>
+  </div>
+
+  <div class="search-results">
+    <button id="prev-result"><i class="fa-solid fa-chevron-up"></i></button>
+    <span id="result-counter">0 de 0</span>
+    <button id="next-result"><i class="fa-solid fa-chevron-down"></i></button>
+    <button id="close-search" title="Cerrar búsqueda"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <script>
+    const docs = [
+      { file: 'documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
+      { file: 'documento2.html', title: 'CÓDIGO PROCESAL PENAL', icon: 'fa-solid fa-scale-balanced' },
+      { file: 'documento3.html', title: 'LEY DE DROGAS', icon: 'fa-solid fa-pills' },
+      { file: 'documento4.html', title: 'LEY DE CONTROL DE ARMAS', icon: 'fa-solid fa-gun' },
+      { file: 'documento5.html', title: 'LEY DE PENAS SUSTITUTIVAS', icon: 'fa-solid fa-person-walking-arrow-right' },
+      { file: 'documento6.html', title: 'LEY DE VIOLENCIA INTRAFAMILIAR', icon: 'fa-solid fa-house-user' },
+      { file: 'documento7.html', title: 'LEY RPA', icon: 'fa-solid fa-child' },
+      { file: 'documento8.html', title: 'LEY RPA (Diferida)', icon: 'fa-solid fa-child-reaching' },
+      { file: 'documento9.html', title: 'LEY DE VIOLENCIA EN LOS ESTADIOS', icon: 'fa-solid fa-futbol' },
+      { file: 'documento10.html', title: 'LEY DE TRANSITO', icon: 'fa-solid fa-car' },
+      { file: 'documento11.html', title: 'LEY ORGANICA DEL MINISTERIO PUBLICO', icon: 'fa-solid fa-building-columns' }
+    ];
+
+    // Elementos DOM
+    const docList = document.getElementById('docList');
+    const viewer = document.getElementById('viewer');
+    const searchInput = document.getElementById('search');
+    const resultCounter = document.getElementById('result-counter');
+    const searchResults = document.querySelector('.search-results');
+    
+    // Variables para búsqueda
+    let highlights = [], currentHit = -1, lastTerm = '';
+    
+    // Construir la lista de documentos
+    function buildDocList() {
+      docList.innerHTML = '';
+      docs.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'doc-item fade-in';
+        card.innerHTML = `
+          <div class="doc-icon"><i class="${doc.icon || 'fa-solid fa-book'}"></i></div>
+          <div class="doc-title">${doc.title}</div>`;
+        card.onclick = () => openDoc(doc.file, doc.title);
+        docList.appendChild(card);
+      });
+    }
+
+    // Cargar un documento
+    async function loadDocument(file, title) {
+      try {
+        const res = await fetch('docs/' + file);
+        if (!res.ok) {
+          viewer.innerHTML = `<div class="error"><h2>Error ${res.status}</h2><p>No se pudo cargar el documento.</p></div>`;
+          return;
+        }
+        
+        const txt = await res.text();
+        
+        // Actualizar título del documento
+        document.title = `${title} - Biblioteca Jurídica ANF`;
+        
+        let html;
+        if (file.endsWith('.md')) {
+          html = marked.parse(txt);
+        } else {
+          const p = new DOMParser();
+          const docHtml = p.parseFromString(txt, 'text/html');
+          docHtml.head.querySelectorAll('style,link').forEach(e => e.remove());
+          html = docHtml.body.innerHTML;
+        }
+        
+        viewer.innerHTML = html;
+        viewer.dataset.original = viewer.innerHTML;
+        
+        // Aplicar resaltado de sintaxis
+        hljs.highlightAll();
+        
+        // Restaurar tamaño de fuente guardado
+        const savedSize = localStorage.getItem('fontSize') || '1rem';
+        viewer.style.fontSize = savedSize;
+        
+        // Limpiar búsqueda
+        resetSearch();
+      } catch (err) {
+        console.error('Error cargando documento:', err);
+        viewer.innerHTML = `<div class="error"><h2>Error</h2><p>${err.message}</p></div>`;
+      }
+    }
+
+    // Abrir un documento
+    function openDoc(file, title) {
+      // Cambiar a vista documento
+      docList.style.display = 'none';
+      viewer.style.display = 'block';
+      
+      // Mostrar barra de herramientas
+      document.getElementById('toolbar').style.display = 'flex';
+      
+      // Ocultar controles de vista
+      document.querySelector('.view-controls').style.display = 'none';
+      
+      // Cargar documento
+      loadDocument(file, title);
+    }
+
+    // Volver al inicio
+    function goHome() {
+      // Actualizar título
+      document.title = 'Biblioteca Jurídica – ANF';
+      
+      // Cambiar a vista de lista
+      viewer.style.display = 'none';
+      docList.style.display = 'grid';
+      
+      // Ocultar barra de herramientas
+      document.getElementById('toolbar').style.display = 'none';
+      
+      // Mostrar controles de vista
+      document.querySelector('.view-controls').style.display = 'flex';
+      
+      // Limpiar búsqueda
+      searchInput.value = '';
+      searchResults.style.display = 'none';
+    }
+
+    // Función para resaltar términos de búsqueda
+    function highlightTerm(root, term) {
+      if (!term.trim()) return;
+      
+      const rx = new RegExp(`(${escapeRx(term)})`, 'gi');
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      
+      nodes.forEach(n => {
+        const val = n.nodeValue;
+        if (!rx.test(val)) return;
+        
+        const frag = document.createDocumentFragment();
+        let last = 0;
+        
+        val.replace(rx, (m, _, off) => {
+          if (off > last) frag.appendChild(document.createTextNode(val.slice(last, off)));
+          const span = document.createElement('span');
+          span.className = 'highlight';
+          span.textContent = m;
+          frag.appendChild(span);
+          last = off + m.length;
+        });
+        
+        if (last < val.length) frag.appendChild(document.createTextNode(val.slice(last)));
+        n.parentNode.replaceChild(frag, n);
+      });
+    }
+
+    // Desplazarse al resultado de búsqueda
+    function scrollToHit(idx) {
+      if (!highlights.length) return;
+      
+      currentHit = (idx + highlights.length) % highlights.length;
+      highlights[currentHit].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Actualizar contador de resultados
+      resultCounter.textContent = `${currentHit + 1} de ${highlights.length}`;
+    }
+
+    // Buscar en documento
+    function doSearch() {
+      const term = searchInput.value.trim();
+      
+      if (!term) {
+        resetSearch();
+        return;
+      }
+      
+      // Si estamos en vista de lista, filtrar documentos
+      if (viewer.style.display !== 'block') {
+        filterDocuments(term);
+        return;
+      }
+      
+      // Si es la misma búsqueda, avanzar al siguiente resultado
+      if (term === lastTerm && highlights.length) {
+        scrollToHit(currentHit + 1);
+        return;
+      }
+      
+      // Nueva búsqueda
+      lastTerm = term;
+      viewer.innerHTML = viewer.dataset.original;
+      highlightTerm(viewer, term);
+      highlights = [...viewer.querySelectorAll('.highlight')];
+      
+      // Mostrar panel de resultados si hay coincidencias
+      if (highlights.length) {
+        searchResults.style.display = 'flex';
+        scrollToHit(0);
+      } else {
+        searchResults.style.display = 'none';
+        resultCounter.textContent = '0 de 0';
+      }
+    }
+
+    // Filtrar documentos en la lista
+    function filterDocuments(term) {
+      const lowerTerm = term.toLowerCase();
+      const items = docList.querySelectorAll('.doc-item');
+      let visibleCount = 0;
+      
+      items.forEach(item => {
+        const title = item.querySelector('.doc-title').textContent.toLowerCase();
+        if (title.includes(lowerTerm)) {
+          item.style.display = '';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+      
+      // Mostrar mensaje si no hay resultados
+      if (visibleCount === 0 && docList.querySelector('.no-results') === null) {
+        const noResults = document.createElement('div');
+        noResults.className = 'no-results';
+        noResults.innerHTML = `<p>No se encontraron documentos que coincidan con "${term}"</p>`;
+        docList.appendChild(noResults);
+      } else if (visibleCount > 0) {
+        const noResults = docList.querySelector('.no-results');
+        if (noResults) noResults.remove();
+      }
+    }
+
+    // Restablecer búsqueda
+    function resetSearch() {
+      highlights = [];
+      currentHit = -1;
+      lastTerm = '';
+      searchResults.style.display = 'none';
+    }
+
+    // Cambiar entre vista de cuadrícula y lista
+    function toggleView(type) {
+      const gridBtn = document.getElementById('grid-view-btn');
+      const listBtn = document.getElementById('list-view-btn');
+      
+      if (type === 'grid') {
+        docList.className = 'grid-view';
+        gridBtn.classList.add('active');
+        listBtn.classList.remove('active');
+        localStorage.setItem('viewMode', 'grid');
+      } else {
+        docList.className = 'list-view';
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+        localStorage.setItem('viewMode', 'list');
+      }
+    }
+
+    // Cambiar tamaño de fuente
+    function changeFont(change) {
+      const currentSize = parseFloat(getComputedStyle(viewer).fontSize);
+      const newSize = Math.max(12, Math.min(24, currentSize + change));
+      viewer.style.fontSize = newSize + 'px';
+      localStorage.setItem('fontSize', viewer.style.fontSize);
+    }
+
+    // Función para escapar caracteres especiales en regex
+    const escapeRx = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+    // Event listeners
+    document.getElementById('btn-home').addEventListener('click', goHome);
+    document.getElementById('btn-font-increase').addEventListener('click', () => changeFont(2));
+    document.getElementById('btn-font-decrease').addEventListener('click', () => changeFont(-2));
+    document.getElementById('grid-view-btn').addEventListener('click', () => toggleView('grid'));
+    document.getElementById('list-view-btn').addEventListener('click', () => toggleView('list'));
+    document.getElementById('prev-result').addEventListener('click', () => scrollToHit(currentHit - 1));
+    document.getElementById('next-result').addEventListener('click', () => scrollToHit(currentHit + 1));
+    document.getElementById('close-search').addEventListener('click', () => {
+      searchInput.value = '';
+      resetSearch();
+      viewer.innerHTML = viewer.dataset.original;
+    });
+    
+    // Búsqueda en tiempo real
+    searchInput.addEventListener('input', () => {
+      // Ejecutar búsqueda después de 300ms de inactividad
+      clearTimeout(searchInput.timeout);
+      searchInput.timeout = setTimeout(doSearch, 300);
+    });
+    
+    searchInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        clearTimeout(searchInput.timeout);
+        doSearch();
+      }
+    });
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', () => {
+      buildDocList();
+      goHome();
+      
+      // Restaurar modo de vista
+      const savedView = localStorage.getItem('viewMode');
+      if (savedView === 'list') {
+        toggleView('list');
+      }
+      
+      // Registrar Service Worker
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .catch(err => console.error('Error al registrar Service Worker:', err));
+      }
+    });
+  </script>
+</body>
+</html>
