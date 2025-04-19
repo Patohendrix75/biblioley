@@ -7,447 +7,323 @@
   <meta content="yes" name="apple-mobile-web-app-capable"/>
   <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
   <meta content="#1f334d" name="theme-color"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport"/>
   <title>Biblioteca Jurídica – ANF</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #1f334d;
-      --primary-light: #2c4a6e;
       --accent: #e63946;
       --bg: #f5f7fa;
       --text: #333;
-      --text-light: #666;
       --card-bg: #fff;
       --radius: 12px;
       --shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      --transition: all 0.3s ease;
-      --border: 1px solid rgba(0, 0, 0, 0.08);
     }
 
-    body {
-      font-family: 'Inter', sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
-      min-height: 100vh;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       background: var(--bg);
       color: var(--text);
-      line-height: 1.5;
+      overflow: hidden;
     }
 
     header {
       background: var(--primary);
       color: #fff;
       padding: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      position: sticky;
-      top: 0;
       z-index: 100;
     }
 
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
+    .title-bar {
       display: flex;
       align-items: center;
-      gap: 1rem;
     }
 
-    #banner {
-      height: 42px;
-      width: auto;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 1.25rem;
+    .title-bar h1 {
+      font-size: 1.4rem;
       font-weight: 600;
+      margin: 0;
       flex: 1;
     }
 
-    #toolbar {
-      display: none;
-      gap: 0.75rem;
+    .search-bar {
+      background: #fff;
+      border-radius: 50px;
+      padding: 0.5rem 1rem;
+      margin-top: 0.75rem;
+      display: flex;
       align-items: center;
-      margin-left: auto;
+      box-shadow: var(--shadow);
     }
 
-    #toolbar button {
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
+    .search-bar input {
+      background: transparent;
       border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
+      flex: 1;
       font-size: 1rem;
-      padding: 0.5rem;
+      padding: 0.25rem;
+      outline: none;
+    }
+
+    .search-icon {
+      color: #666;
+      margin-right: 0.5rem;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem;
+      background: #e8ebf0;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .toolbar.hidden {
+      display: none;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      border-radius: 50%;
       width: 40px;
       height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: var(--transition);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      color: var(--primary);
+      font-size: 1.1rem;
     }
 
-    #toolbar button:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: translateY(-2px);
+    .btn:active {
+      transform: scale(0.95);
     }
 
-    .search-container {
-      position: relative;
+    .view-btns {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .container {
       flex: 1;
-      max-width: 500px;
-      margin-left: auto;
+      overflow-y: auto;
+      padding: 0.75rem;
     }
 
-    #search {
-      width: 100%;
-      border: none;
-      border-radius: var(--radius);
-      padding: 0.75rem 1rem 0.75rem 2.5rem;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-      font-family: inherit;
-      font-size: 0.9rem;
-    }
-
-    #search:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px var(--accent);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 0.75rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-light);
-      pointer-events: none;
-    }
-
-    .main-content {
-      flex: 1;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 1.5rem;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    #docList {
+    .doc-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.5rem;
-      transition: var(--transition);
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
     }
 
     .doc-item {
       background: var(--card-bg);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      padding: 1.25rem 0.75rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      cursor: pointer;
-      transition: var(--transition);
-      border: var(--border);
-      aspect-ratio: 3/4;
-      position: relative;
-      overflow: hidden;
+      gap: 0.75rem;
+      box-shadow: var(--shadow);
+      border-top: 4px solid var(--primary);
+      touch-action: manipulation;
     }
 
-    .doc-item:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 8px;
-      background: var(--primary);
-      transition: var(--transition);
-    }
-
-    .doc-item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .doc-item:hover:before {
-      background: var(--accent);
+    .doc-item:active {
+      transform: scale(0.98);
     }
 
     .doc-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 2rem;
       color: var(--primary);
-      transition: var(--transition);
-    }
-
-    .doc-item:hover .doc-icon {
-      color: var(--accent);
-      transform: scale(1.1);
     }
 
     .doc-title {
       text-align: center;
       font-weight: 600;
-      font-size: 1rem;
-      color: var(--text);
-      transition: var(--transition);
+      font-size: 0.85rem;
+      line-height: 1.3;
+    }
+
+    .doc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .doc-list .doc-item {
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 0.75rem;
+      text-align: left;
+    }
+
+    .doc-list .doc-icon {
+      font-size: 1.5rem;
+    }
+
+    .doc-list .doc-title {
+      text-align: left;
     }
 
     #viewer {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 2rem;
-      display: none;
-      line-height: 1.6;
-      border: var(--border);
+      padding: 1rem;
+      flex: 1;
+      overflow-y: auto;
+      background: #fff;
+      line-height: 1.5;
+      font-size: 1rem;
     }
 
-    #viewer h1, #viewer h2 {
-      color: var(--primary);
-      border-bottom: 1px solid #eee;
-      padding-bottom: 0.5rem;
+    #viewer h1 {
+      font-size: 1.4rem;
+      margin: 1rem 0;
+    }
+
+    #viewer h2 {
+      font-size: 1.2rem;
+      margin: 1rem 0;
     }
 
     .highlight {
-      background: #ffeeba;
-      color: #000;
-      border-radius: 4px;
-      padding: 0 4px;
-      box-shadow: 0 0 0 2px rgba(255, 235, 59, 0.3);
+      background: #ffe169;
+      padding: 0 2px;
+      border-radius: 2px;
     }
 
-    .view-controls {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .view-btn {
-      background: var(--card-bg);
-      border: var(--border);
-      border-radius: var(--radius);
-      padding: 0.5rem;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .view-btn.active {
-      background: var(--primary);
-      color: white;
-    }
-
-    .list-view {
-      grid-template-columns: 1fr !important;
-      gap: 0.75rem;
-    }
-
-    .list-view .doc-item {
-      flex-direction: row;
-      aspect-ratio: unset;
-      padding: 0.75rem 1.5rem;
-      justify-content: flex-start;
-      gap: 1rem;
-    }
-
-    .list-view .doc-icon {
-      font-size: 1.5rem;
-      margin-bottom: 0;
-    }
-
-    .list-view .doc-item:before {
-      width: 8px;
-      height: 100%;
-    }
-
-    /* Modo oscuro */
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --primary: #2c4a6e;
-        --primary-light: #3a617e;
-        --accent: #e63946;
-        --bg: #121212;
-        --text: #eee;
-        --text-light: #aaa;
-        --card-bg: #1e1e1e;
-        --border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      #search {
-        background: #292929;
-        color: #eee;
-      }
-
-      .highlight {
-        background: #6d5a00;
-        color: #fff;
-        box-shadow: 0 0 0 2px rgba(109, 90, 0, 0.3);
-      }
-
-      #viewer h1, #viewer h2 {
-        border-bottom-color: #333;
-      }
-    }
-
-    /* Ajustes móviles */
-    @media (max-width: 768px) {
-      .header-content {
-        flex-wrap: wrap;
-      }
-
-      #banner {
-        height: 32px;
-      }
-
-      h1 {
-        font-size: 1.1rem;
-      }
-
-      #toolbar {
-        width: 100%;
-        margin-top: 1rem;
-        justify-content: space-between;
-      }
-
-      .main-content {
-        padding: 1rem;
-      }
-
-      #docList {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-      }
-
-      .doc-icon {
-        font-size: 2rem;
-      }
-
-      .doc-title {
-        font-size: 0.9rem;
-      }
-
-      #viewer {
-        padding: 1rem;
-      }
-
-      .search-container {
-        width: 100%;
-        margin-top: 0.75rem;
-        max-width: none;
-      }
-    }
-
-    @media (max-width: 480px) {
-      #banner {
-        display: none;
-      }
-
-      #docList {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .doc-item {
-        padding: 1rem;
-      }
-    }
-
-    /* Estilos para la navegación por resultados de búsqueda */
     .search-results {
-      background: var(--primary);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: var(--radius);
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
       position: fixed;
       bottom: 1rem;
       left: 50%;
       transform: translateX(-50%);
+      background: var(--primary);
+      border-radius: 50px;
+      color: white;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       box-shadow: var(--shadow);
       z-index: 100;
+      display: none;
     }
 
     .search-results button {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255,255,255,0.2);
       border: none;
-      color: white;
       border-radius: 50%;
       width: 30px;
       height: 30px;
+      color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
     }
 
-    .search-results button:hover {
-      background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Animaciones */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .fade-in {
-      animation: fadeIn 0.3s ease forwards;
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #1f334d;
+        --bg: #121212;
+        --text: #eee; 
+        --card-bg: #1e1e1e;
+      }
+      
+      .search-bar {
+        background: #333;
+      }
+      
+      .search-bar input {
+        color: #fff;
+      }
+      
+      .toolbar {
+        background: #222;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+      
+      .btn {
+        background: rgba(0,0,0,0.3);
+        color: #eee;
+      }
+      
+      #viewer {
+        background: #1e1e1e;
+        color: #eee;
+      }
+      
+      .highlight {
+        background: #6d5a00;
+        color: #fff;
+      }
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="header-content">
-      <img alt="Banner ANF" id="banner" src="banner.jpg"/>
+    <div class="title-bar">
       <h1>Biblioteca Jurídica</h1>
-      
-      <div id="toolbar">
-        <button id="btn-home" title="Volver al inicio"><i class="fa-solid fa-house"></i></button>
-        <button id="btn-font-decrease" title="Disminuir tamaño de texto"><i class="fa-solid fa-text-height fa-sm"></i></button>
-        <button id="btn-font-increase" title="Aumentar tamaño de texto"><i class="fa-solid fa-text-height"></i></button>
-      </div>
-
-      <div class="search-container">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input id="search" placeholder="Buscar por título o contenido..."/>
-      </div>
+    </div>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input id="search" type="text" placeholder="Buscar por título o contenido..." />
     </div>
   </header>
 
-  <div class="main-content">
-    <div class="view-controls">
-      <button class="view-btn active" id="grid-view-btn" title="Vista en cuadrícula">
-        <i class="fa-solid fa-grip"></i>
+  <div class="toolbar" id="view-toolbar">
+    <div class="view-btns">
+      <button class="btn active" id="grid-view-btn" title="Vista en cuadrícula">
+        <i class="fa-solid fa-grid-2"></i>
       </button>
-      <button class="view-btn" id="list-view-btn" title="Vista en lista">
+      <button class="btn" id="list-view-btn" title="Vista en lista">
         <i class="fa-solid fa-list"></i>
       </button>
     </div>
-    
-    <div class="grid-view" id="docList"></div>
-    <div id="viewer"></div>
+  </div>
+
+  <div class="toolbar hidden" id="doc-toolbar">
+    <button class="btn" id="btn-back" title="Volver">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div>
+      <button class="btn" id="btn-font-decrease" title="Reducir texto">
+        <i class="fa-solid fa-minus"></i>
+      </button>
+      <button class="btn" id="btn-font-increase" title="Aumentar texto">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="doc-grid" id="docList"></div>
+    <div id="viewer" style="display:none;"></div>
   </div>
 
   <div class="search-results">
     <button id="prev-result"><i class="fa-solid fa-chevron-up"></i></button>
     <span id="result-counter">0 de 0</span>
     <button id="next-result"><i class="fa-solid fa-chevron-down"></i></button>
-    <button id="close-search" title="Cerrar búsqueda"><i class="fa-solid fa-xmark"></i></button>
+    <button id="close-search"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
   <script>
@@ -469,6 +345,8 @@
     const docList = document.getElementById('docList');
     const viewer = document.getElementById('viewer');
     const searchInput = document.getElementById('search');
+    const viewToolbar = document.getElementById('view-toolbar');
+    const docToolbar = document.getElementById('doc-toolbar');
     const resultCounter = document.getElementById('result-counter');
     const searchResults = document.querySelector('.search-results');
     
@@ -480,11 +358,11 @@
       docList.innerHTML = '';
       docs.forEach(doc => {
         const card = document.createElement('div');
-        card.className = 'doc-item fade-in';
+        card.className = 'doc-item';
         card.innerHTML = `
           <div class="doc-icon"><i class="${doc.icon || 'fa-solid fa-book'}"></i></div>
           <div class="doc-title">${doc.title}</div>`;
-        card.onclick = () => openDoc(doc.file, doc.title);
+        card.addEventListener('click', () => openDoc(doc.file, doc.title));
         docList.appendChild(card);
       });
     }
@@ -520,7 +398,7 @@
         hljs.highlightAll();
         
         // Restaurar tamaño de fuente guardado
-        const savedSize = localStorage.getItem('fontSize') || '1rem';
+        const savedSize = localStorage.getItem('fontSize') || '16px';
         viewer.style.fontSize = savedSize;
         
         // Limpiar búsqueda
@@ -537,11 +415,9 @@
       docList.style.display = 'none';
       viewer.style.display = 'block';
       
-      // Mostrar barra de herramientas
-      document.getElementById('toolbar').style.display = 'flex';
-      
-      // Ocultar controles de vista
-      document.querySelector('.view-controls').style.display = 'none';
+      // Cambiar barras de herramientas
+      viewToolbar.classList.add('hidden');
+      docToolbar.classList.remove('hidden');
       
       // Cargar documento
       loadDocument(file, title);
@@ -556,11 +432,9 @@
       viewer.style.display = 'none';
       docList.style.display = 'grid';
       
-      // Ocultar barra de herramientas
-      document.getElementById('toolbar').style.display = 'none';
-      
-      // Mostrar controles de vista
-      document.querySelector('.view-controls').style.display = 'flex';
+      // Cambiar barras de herramientas
+      docToolbar.classList.add('hidden');
+      viewToolbar.classList.remove('hidden');
       
       // Limpiar búsqueda
       searchInput.value = '';
@@ -666,7 +540,7 @@
       if (visibleCount === 0 && docList.querySelector('.no-results') === null) {
         const noResults = document.createElement('div');
         noResults.className = 'no-results';
-        noResults.innerHTML = `<p>No se encontraron documentos que coincidan con "${term}"</p>`;
+        noResults.innerHTML = `<p style="text-align:center;padding:1rem;">No se encontraron documentos que coincidan con "${term}"</p>`;
         docList.appendChild(noResults);
       } else if (visibleCount > 0) {
         const noResults = docList.querySelector('.no-results');
@@ -688,12 +562,12 @@
       const listBtn = document.getElementById('list-view-btn');
       
       if (type === 'grid') {
-        docList.className = 'grid-view';
+        docList.className = 'doc-grid';
         gridBtn.classList.add('active');
         listBtn.classList.remove('active');
         localStorage.setItem('viewMode', 'grid');
       } else {
-        docList.className = 'list-view';
+        docList.className = 'doc-list';
         listBtn.classList.add('active');
         gridBtn.classList.remove('active');
         localStorage.setItem('viewMode', 'list');
@@ -712,9 +586,9 @@
     const escapeRx = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
     // Event listeners
-    document.getElementById('btn-home').addEventListener('click', goHome);
-    document.getElementById('btn-font-increase').addEventListener('click', () => changeFont(2));
-    document.getElementById('btn-font-decrease').addEventListener('click', () => changeFont(-2));
+    document.getElementById('btn-back').addEventListener('click', goHome);
+    document.getElementById('btn-font-increase').addEventListener('click', () => changeFont(1));
+    document.getElementById('btn-font-decrease').addEventListener('click', () => changeFont(-1));
     document.getElementById('grid-view-btn').addEventListener('click', () => toggleView('grid'));
     document.getElementById('list-view-btn').addEventListener('click', () => toggleView('list'));
     document.getElementById('prev-result').addEventListener('click', () => scrollToHit(currentHit - 1));
