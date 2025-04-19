@@ -75,12 +75,12 @@
         <label for="nonComplianceDays">Días de Incumplimiento:</label>
         <input type="number" id="nonComplianceDays" min="0" value="0" required>
         
-        <button onclick="calculateDays()">Calcular días y abono</button>
+        <button id="calculateBtn">Calcular días y abono</button>
         
         <div class="result" id="result"></div>
     </div>
 
-    <div class="footer">Creado por JPAL. Mayo, 2024</div>
+
 
     <script>
         function calculateDays() {
@@ -109,5 +109,11 @@
         }
     </script>
 
-</body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('calculateBtn').addEventListener('click', calculateDays);
+        });
+    </script>
+    </body>
 </html>
