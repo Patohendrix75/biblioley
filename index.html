@@ -81,7 +81,7 @@
     
     /* Ocultar búsqueda en modo documento */
     header.compact .search-bar {
-      display: none;
+      display: flex;
     }
 
     .search-bar input {
@@ -132,9 +132,9 @@
     
     /* Botones más pequeños en modo documento */
     .toolbar.compact .btn {
-      width: 36px;
-      height: 36px;
-      font-size: 0.9rem;
+      width: 30px;
+      height: 30px;
+      font-size: 0.85rem;
     }
 
     .btn:active {
@@ -319,6 +319,23 @@
         color: #fff;
       }
     }
+  
+@media screen and (max-width: 480px) {
+  #viewer {
+    padding: 0.5rem !important;
+    font-size: 0.95rem;
+  }
+
+  .toolbar.compact .btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .doc-header-title {
+    font-size: 0.8rem;
+  }
+}
+
   </style>
 </head>
 <body>
