@@ -336,6 +336,12 @@
   }
 }
 
+  
+    .doc-item.calculadora {
+      border-top: 4px solid #2a5d68;
+      background: #f1f6f5;
+    }
+
   </style>
 </head>
 <body>
@@ -389,6 +395,7 @@
 
   <script>
     const docs = [
+      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
       { file: 'documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
       { file: 'documento2.html', title: 'CÓDIGO PROCESAL PENAL', icon: 'fa-solid fa-scale-balanced' },
       { file: 'documento3.html', title: 'LEY DE DROGAS', icon: 'fa-solid fa-pills' },
@@ -423,6 +430,7 @@
       docs.forEach(doc => {
         const card = document.createElement('div');
         card.className = 'doc-item';
+        if (doc.title.includes('Calculadora')) card.classList.add('calculadora');
         card.innerHTML = `
           <div class="doc-icon"><i class="${doc.icon || 'fa-solid fa-book'}"></i></div>
           <div class="doc-title">${doc.title}</div>`;
