@@ -87,6 +87,11 @@
       width: 30px; height: 30px; display: flex; align-items: center;
       justify-content: center; color: #fff; cursor: pointer;
     }
+    .error-message {
+      background: #f8d7da; color: #721c24; padding: 1rem;
+      border-radius: var(--radius); margin: 1rem 0;
+      border-left: 4px solid #f5c6cb;
+    }
     @media (max-width:480px) {
       .doc-grid { grid-template-columns: 1fr; }
       .btn { width: 36px; height: 36px; font-size: 1rem; }
@@ -139,38 +144,38 @@
 
   <script>
     const docs = [
-      { file: 'minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)', icon: 'fa-solid fa-id-card', category: 'Control de Identidad' },
-      { file: 'minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 03 – Acceso a información en Facebook', icon: 'fa-brands fa-facebook', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 04 – Prueba incorporada después del cierre de la investigación', icon: 'fa-solid fa-vial', category: 'Evidencia y Cadena de Custodia' },
-      { file: 'minutas/N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 05 – Artículo 195 Ley 18.290 (Omisión de auxilio)', icon: 'fa-solid fa-ambulance', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 06 – Revisión de teléfonos móviles incautados', icon: 'fa-solid fa-mobile-screen-button', category: 'Diligencias e Investigación inicial' },
-      { file: 'minutas/N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 07 – Primeras diligencias y GPS', icon: 'fa-solid fa-map-pin', category: 'Diligencias e Investigación inicial' },
-      { file: 'minutas/N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 08 – Efecto de la apelación de la revocación de pena sustitutiva', icon: 'fa-solid fa-file-pen', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 09 – Control de identidad en investigación en curso', icon: 'fa-solid fa-user-secret', category: 'Control de Identidad' },
-      { file: 'minutas/N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en porte o tenencia de armas', icon: 'fa-solid fa-gun', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación provisional previa al informe psiquiátrico', icon: 'fa-solid fa-hospital-user', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: necesidad de declaración previa', icon: 'fa-solid fa-comment-dots', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de identidad (arrojar objeto)', icon: 'fa-solid fa-box', category: 'Control de Identidad' },
-      { file: 'minutas/N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por videoconferencia', icon: 'fa-solid fa-video', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de identidad y denuncia anónima', icon: 'fa-solid fa-user-secret', category: 'Control de Identidad' },
-      { file: 'minutas/N°16__DETENCION_POR_GUARDIAS_DE_SEGURIDAD_O_MUNICIPALES.md', title: 'Minuta Nº 16 – Detención por guardias de seguridad o municipales', icon: 'fa-solid fa-shield-halved', category: 'Detención y Aprehensión' },
-      { file: 'minutas/N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_O_FRUSTRADOS.md', title: 'Minuta Nº 17 – Dolo eventual y delitos tentados o frustrados', icon: 'fa-solid fa-brain', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°18_DETENCION_POR_PARTICULARES.md', title: 'Minuta Nº 18 – Detención por particulares', icon: 'fa-solid fa-handshake', category: 'Detención y Aprehensión' },
-      { file: 'minutas/N°19_CONTROL_DE_IDENTIDAD_PREVENTIVO_QUE_MUTA_A_INVESTIGATIVO.md', title: 'Minuta Nº 19 – Control de identidad preventivo que muta a investigativo', icon: 'fa-solid fa-user-check', category: 'Control de Identidad' },
-      { file: 'minutas/N°20_CADENA_DE_CUSTODIA_Y_DEBIDO_PROCESO.md', title: 'Minuta Nº 20 – Cadena de custodia y debido proceso', icon: 'fa-solid fa-shield-check', category: 'Evidencia y Cadena de Custodia' },
-      { file: 'minutas/N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title: 'Minuta Nº 21 – Control de identidad: olor a marihuana', icon: 'fa-solid fa-smog', category: 'Control de Identidad' },
-      { file: 'minutas/N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title: 'Minuta Nº 22 – Control de identidad y huida', icon: 'fa-solid fa-person-running', category: 'Control de Identidad' },
-      { file: 'minutas/N°23_CONTROL_IDENTIDAD_Y_CAN_DETECTOR_DE_DROGAS.md', title: 'Minuta Nº 23 – Control de identidad y can detector de drogas', icon: 'fa-solid fa-dog', category: 'Control de Identidad' },
-      { file: 'minutas/N°24_Reclamos_por_infracción_de_garantías_de_terceros.md', title: 'Minuta Nº 24 – Reclamos por infracción de garantías de terceros', icon: 'fa-solid fa-gavel', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°25_Porte_o_tenencia_de_una_munición.md', title: 'Minuta Nº 25 – Porte o tenencia de una munición', icon: 'fa-solid fa-bullet', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°26_Delito_continuado_-_reiterado.md', title: 'Minuta Nº 26 – Delito continuado / reiterado', icon: 'fa-solid fa-repeat', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°26-Delito-continuado-reiterado_.md', title: 'Minuta Nº 26b – Delito continuado / reiterado (duplicado)', icon: 'fa-solid fa-repeat', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°27_Control_de_identidad_-_Transacción_en_la_vía_pública.md', title: 'Minuta Nº 27 – Control de identidad: transacción en la vía pública', icon: 'fa-solid fa-shopping-cart', category: 'Control de Identidad' },
-      { file: 'minutas/N°28_Obligatoriedad_del_artículo_302_del_CPP_durante_la_etapa_investigativa.md', title: 'Minuta Nº 28 – Oblig. art. 302 CPP en etapa investigativa', icon: 'fa-solid fa-file-contract', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°29_Abuso_sexual_-_Introducción_de_dedos.md', title: 'Minuta Nº 29 – Abuso sexual: introducción de dedos', icon: 'fa-solid fa-hand-paper', category: 'Delitos y Tipicidad' },
-      { file: 'minutas/N°30_Actuaciones_autónomas_de_Carabineros_en_marchas_y_manifestaciones.md', title: 'Minuta Nº 30 – Actuaciones autónomas de Carabineros en marchas y manifestaciones', icon: 'fa-solid fa-police-car', category: 'Procedimiento y Garantías' },
-      { file: 'minutas/N°31_Retractación_Víctima_331_letra_f)_CPP.md', title: 'Minuta Nº 31 – Retractación de la víctima e incorporación de su declaración previa', icon: 'fa-solid fa-comment-slash', category: 'Evidencia y Cadena de Custodia' },
-      { file: 'minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'Minuta Nº 32 – Instrucción sobre primeras diligencias', icon: 'fa-solid fa-clipboard-list', category: 'Diligencias e Investigación inicial' }
+      { file: 'N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)', icon: 'fa-solid fa-id-card', category: 'Control de Identidad' },
+      { file: 'N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 03 – Acceso a información en Facebook', icon: 'fa-brands fa-facebook', category: 'Procedimiento y Garantías' },
+      { file: 'N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 04 – Prueba incorporada después del cierre de la investigación', icon: 'fa-solid fa-vial', category: 'Evidencia y Cadena de Custodia' },
+      { file: 'N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 05 – Artículo 195 Ley 18.290 (Omisión de auxilio)', icon: 'fa-solid fa-ambulance', category: 'Delitos y Tipicidad' },
+      { file: 'N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 06 – Revisión de teléfonos móviles incautados', icon: 'fa-solid fa-mobile-screen-button', category: 'Diligencias e Investigación inicial' },
+      { file: 'N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 07 – Primeras diligencias y GPS', icon: 'fa-solid fa-map-pin', category: 'Diligencias e Investigación inicial' },
+      { file: 'N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 08 – Efecto de la apelación de la revocación de pena sustitutiva', icon: 'fa-solid fa-file-pen', category: 'Procedimiento y Garantías' },
+      { file: 'N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 09 – Control de identidad en investigación en curso', icon: 'fa-solid fa-user-secret', category: 'Control de Identidad' },
+      { file: 'N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en porte o tenencia de armas', icon: 'fa-solid fa-gun', category: 'Delitos y Tipicidad' },
+      { file: 'N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación provisional previa al informe psiquiátrico', icon: 'fa-solid fa-hospital-user', category: 'Procedimiento y Garantías' },
+      { file: 'N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: necesidad de declaración previa', icon: 'fa-solid fa-comment-dots', category: 'Procedimiento y Garantías' },
+      { file: 'N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de identidad (arrojar objeto)', icon: 'fa-solid fa-box', category: 'Control de Identidad' },
+      { file: 'N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por videoconferencia', icon: 'fa-solid fa-video', category: 'Procedimiento y Garantías' },
+      { file: 'N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de identidad y denuncia anónima', icon: 'fa-solid fa-user-secret', category: 'Control de Identidad' },
+      { file: 'N°16__DETENCION_POR_GUARDIAS_DE_SEGURIDAD_O_MUNICIPALES.md', title: 'Minuta Nº 16 – Detención por guardias de seguridad o municipales', icon: 'fa-solid fa-shield-halved', category: 'Detención y Aprehensión' },
+      { file: 'N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_O_FRUSTRADOS.md', title: 'Minuta Nº 17 – Dolo eventual y delitos tentados o frustrados', icon: 'fa-solid fa-brain', category: 'Delitos y Tipicidad' },
+      { file: 'N°18_DETENCION_POR_PARTICULARES.md', title: 'Minuta Nº 18 – Detención por particulares', icon: 'fa-solid fa-handshake', category: 'Detención y Aprehensión' },
+      { file: 'N°19_CONTROL_DE_IDENTIDAD_PREVENTIVO_QUE_MUTA_A_INVESTIGATIVO.md', title: 'Minuta Nº 19 – Control de identidad preventivo que muta a investigativo', icon: 'fa-solid fa-user-check', category: 'Control de Identidad' },
+      { file: 'N°20_CADENA_DE_CUSTODIA_Y_DEBIDO_PROCESO.md', title: 'Minuta Nº 20 – Cadena de custodia y debido proceso', icon: 'fa-solid fa-shield-check', category: 'Evidencia y Cadena de Custodia' },
+      { file: 'N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title: 'Minuta Nº 21 – Control de identidad: olor a marihuana', icon: 'fa-solid fa-smog', category: 'Control de Identidad' },
+      { file: 'N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title: 'Minuta Nº 22 – Control de identidad y huida', icon: 'fa-solid fa-person-running', category: 'Control de Identidad' },
+      { file: 'N°23_CONTROL_IDENTIDAD_Y_CAN_DETECTOR_DE_DROGAS.md', title: 'Minuta Nº 23 – Control de identidad y can detector de drogas', icon: 'fa-solid fa-dog', category: 'Control de Identidad' },
+      { file: 'N°24_Reclamos_por_infracción_de_garantías_de_terceros.md', title: 'Minuta Nº 24 – Reclamos por infracción de garantías de terceros', icon: 'fa-solid fa-gavel', category: 'Procedimiento y Garantías' },
+      { file: 'N°25_Porte_o_tenencia_de_una_munición.md', title: 'Minuta Nº 25 – Porte o tenencia de una munición', icon: 'fa-solid fa-bullet', category: 'Delitos y Tipicidad' },
+      { file: 'N°26_Delito_continuado_-_reiterado.md', title: 'Minuta Nº 26 – Delito continuado / reiterado', icon: 'fa-solid fa-repeat', category: 'Delitos y Tipicidad' },
+      { file: 'N°26-Delito-continuado-reiterado_.md', title: 'Minuta Nº 26b – Delito continuado / reiterado (duplicado)', icon: 'fa-solid fa-repeat', category: 'Delitos y Tipicidad' },
+      { file: 'N°27_Control_de_identidad_-_Transacción_en_la_vía_pública.md', title: 'Minuta Nº 27 – Control de identidad: transacción en la vía pública', icon: 'fa-solid fa-shopping-cart', category: 'Control de Identidad' },
+      { file: 'N°28_Obligatoriedad_del_artículo_302_del_CPP_durante_la_etapa_investigativa.md', title: 'Minuta Nº 28 – Oblig. art. 302 CPP en etapa investigativa', icon: 'fa-solid fa-file-contract', category: 'Procedimiento y Garantías' },
+      { file: 'N°29_Abuso_sexual_-_Introducción_de_dedos.md', title: 'Minuta Nº 29 – Abuso sexual: introducción de dedos', icon: 'fa-solid fa-hand-paper', category: 'Delitos y Tipicidad' },
+      { file: 'N°30_Actuaciones_autónomas_de_Carabineros_en_marchas_y_manifestaciones.md', title: 'Minuta Nº 30 – Actuaciones autónomas de Carabineros en marchas y manifestaciones', icon: 'fa-solid fa-police-car', category: 'Procedimiento y Garantías' },
+      { file: 'N°31_Retractación_Víctima_331_letra_f)_CPP.md', title: 'Minuta Nº 31 – Retractación de la víctima e incorporación de su declaración previa', icon: 'fa-solid fa-comment-slash', category: 'Evidencia y Cadena de Custodia' },
+      { file: 'N°32_Instrucción_sobre_primeras_diligencias.md', title: 'Minuta Nº 32 – Instrucción sobre primeras diligencias', icon: 'fa-solid fa-clipboard-list', category: 'Diligencias e Investigación inicial' }
     ];
 
     // Construye la cuadrícula o lista según vista
@@ -195,14 +200,42 @@
     async function loadDocument(file, title) {
       const viewer = document.getElementById('viewer');
       try {
-        const res = await fetch('docs/' + file);
+        // Mostrar mensaje de carga
+        viewer.innerHTML = '<p>Cargando documento...</p>';
+        
+        // Modificar la ruta para intentar cargar desde diferentes lugares
+        // Primero intentamos la ruta directa
+        let res = await fetch(file);
+        
+        // Si falla, intentamos con minutas/
+        if (!res.ok) {
+          res = await fetch('minutas/' + file);
+        }
+        
+        // Si sigue fallando, intentamos con docs/minutas/
+        if (!res.ok) {
+          res = await fetch('docs/minutas/' + file);
+        }
+        
+        // Si sigue fallando, mostramos un error
+        if (!res.ok) {
+          throw new Error(`No se pudo cargar el documento. Código de error: ${res.status}`);
+        }
+        
         const text = await res.text();
         const html = file.toLowerCase().endsWith('.md') ? marked.parse(text) : text;
         viewer.innerHTML = html;
         viewer.dataset.original = html;
         hljs.highlightAll();
       } catch (e) {
-        viewer.innerHTML = `<p>Error al cargar: ${e.message}</p>`;
+        console.error("Error cargando documento:", e);
+        viewer.innerHTML = `
+          <div class="error-message">
+            <h3>Error al cargar el documento</h3>
+            <p>${e.message}</p>
+            <p>Verifica que el archivo exista y esté en la ubicación correcta.</p>
+          </div>
+        `;
       }
     }
 
