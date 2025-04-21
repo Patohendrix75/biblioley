@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Calculadora Abonos por Arresto</title>
-  <style><CODE_BLOCK>
+  <style><CODE_BLOCK>/* Specificity increased by adding html */
     body {
       font-family: sans-serif;
       background-color: #f4f4f4;
@@ -12,8 +12,8 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
-    }
+      margin: 0;  /* Ensure no default body margins */
+    } /* Added comment for clarity */
 
     .calculator {
       background-color: #fff;
@@ -78,27 +78,33 @@
       font-style: italic;
       color: #555;
     }
+  
+/* Apply styles specifically within .calculator to avoid conflicts */
+html body .calculator .abono-result { /* Further increased specificity */
+  background-color: #e9ecef;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    /* Estilos para resaltar el resultado del abono */
-    .abono-result {
-      background-color: #e9ecef; /* Un color de fondo suave */
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Una sombra sutil */
-    }
-  
-    .abono-result p {
-      font-size: 1.1em;
-      margin: 5px 0;
-    }
-  
-    .abono-result .valor {
-      font-size: 1.5em; /* Tamaño de fuente más grande para el valor */
-      font-weight: bold;
-      color: #28a745; /* Un color destacado, por ejemplo, verde */
-    }
+html body .calculator .abono-result p {
+  font-size: 1.1em;
+  margin: 5px 0;
+}
+
+html body .calculator .abono-result .valor {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Corrected class name and applied to the specific element */
+html body .calculator #result { /* Style the container */
+  margin-top: 20px;
+  /* Add other styles for the result container if needed */
+}
   
     /* Media query para pantallas pequeñas (móviles) */
     @media (max-width: 480px) {
@@ -106,7 +112,7 @@
         width: 90%; /* Ocupa un poco menos del ancho en móviles */
         padding: 15px;
       }
-    }
+    } /* Ensure the media query applies specifically */
   
   </CODE_BLOCK></style>
 </head>
@@ -127,15 +133,11 @@
       <input type="number" id="nonComplianceDays" min="0" value="0" required>
     </div>
     <button id="calculateBtn">Calcular días y abono</button>
-    <div id="result" style="display: none;">
-      <div class="result-message">Resultados:</div>
-      <div class="result-details">
-        <p>
-          Período total: <span id="totalDays"></span>
-        </p>
-        <p>
-          Días efectivos de arresto: <span id="effectiveDays"></span>
-        </p>
+    <div id="result" style="display: none;"> <!-- Keep the inline style for initial state -->
+      <div class="result-message">Resultados:</div>  <!-- Added a title for clarity -->
+      <div class="result-details"> <!-- Ensure this structure is correct -->
+        <p>Período total: <span id="totalDays"></span></p>
+        <p>Días efectivos de arresto: <span id="effectiveDays"></span></p>
       </div>
       <div class="abono-result">
         <p>DÍAS DE ABONO:</p>
@@ -180,10 +182,11 @@
         document.getElementById('totalDays').textContent = `${diff} día${diff !== 1 ? 's' : ''}`;
         document.getElementById('effectiveDays').textContent = efectivos;
         document.getElementById('abonoDays').textContent = abono.toFixed(2);
-        out.style.display = 'block';
         
-        // Hacer scroll al resultado (opcional)
-        out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+       // Show the result by removing the inline style
+       out.style.display = '';
+       // Optional: Scroll to the result
+       out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
       // Lógica inicial (opcional)
