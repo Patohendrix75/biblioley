@@ -53,6 +53,7 @@
     .doc-item { background: var(--card-bg); border-radius: var(--radius); padding: 1.25rem 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; box-shadow: var(--shadow); border-top: 4px solid var(--primary); touch-action: manipulation; }
     .doc-item:active { transform: scale(0.98); }
     .doc-item.calculadora { border-top: 4px solid #2a5d68; background: #f1f6f5; }
+    .doc-item.minutas { border-top: 4px solid #8e44ad; background: #f5f3f8; }
     .doc-icon { font-size: 2rem; color: var(--primary); }
     .doc-list .doc-icon { font-size: 1.5rem; }
     .doc-title { text-align: center; font-weight: 600; font-size: 0.85rem; line-height: 1.3; }
@@ -64,6 +65,8 @@
     .search-results { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--primary); border-radius: 50px; color: white; padding: 0.5rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow); z-index: 100; display: none; }
     .search-results button { background: rgba(255,255,255,0.2); border: none; border-radius: 50%; width: 30px; height: 30px; color: white; display: flex; align-items: center; justify-content: center; }
     .doc-header-title { margin-left: 0.5rem; font-size: 0.9rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+    .loading { display: flex; justify-content: center; align-items: center; height: 100%; font-size: 1.2rem; color: var(--primary); }
+    .error { padding: 1rem; background: #ffeeee; border-left: 4px solid #e63946; color: #333; margin: 1rem 0; }
     @media (prefers-color-scheme: dark) {
       :root { --primary: #1f334d; --bg: #121212; --text: #eee; --card-bg: #1e1e1e; }
       .search-bar { background: #333; }
@@ -72,6 +75,7 @@
       .btn { background: rgba(0,0,0,0.3); color: #eee; }
       #viewer { background: #1e1e1e; color: #eee; }
       .highlight { background: #6d5a00; color: #fff; }
+      .error { background: #3a1b1b; color: #f8d7da; }
     }
     @media screen and (max-width: 480px) {
       #viewer { padding: 0.5rem !important; font-size: 0.95rem; }
@@ -111,6 +115,7 @@
   <div class="container" id="main-container">
     <div class="doc-grid" id="docList"></div>
     <div id="viewer"></div>
+    <div id="minutasList" style="display:none" class="doc-grid"></div>
   </div>
 
   <div class="search-results">
@@ -121,9 +126,29 @@
   </div>
 
   <script>
+    // Referencias DOM para elementos usados frecuentemente
+    const docList = document.getElementById('docList');
+    const viewer = document.getElementById('viewer');
+    const minutasList = document.getElementById('minutasList');
+    const searchInput = document.getElementById('search');
+    const viewToolbar = document.getElementById('view-toolbar');
+    const docToolbar = document.getElementById('doc-toolbar');
+    const mainHeader = document.getElementById('main-header');
+    const mainContainer = document.getElementById('main-container');
+    const docTitleHeader = document.getElementById('doc-title-header');
+    const searchResults = document.querySelector('.search-results');
+    const resultCounter = document.getElementById('result-counter');
+    
+    // Función para cambiar el tamaño de fuente
+    function changeFont(dir) {
+      const currentSize = parseInt(window.getComputedStyle(viewer).fontSize);
+      const newSize = Math.max(12, Math.min(24, currentSize + dir * 2));
+      viewer.style.fontSize = `${newSize}px`;
+      localStorage.setItem('fontSize', `${newSize}px`);
+    }
+
     // Definición de documentos con tarjeta de Minutas + leyes + calculadora
     const docs = [
-     
       { file: 'documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
       { file: 'documento2.html', title: 'CÓDIGO PROCESAL PENAL', icon: 'fa-solid fa-scale-balanced' },
       { file: 'documento3.html', title: 'LEY DE DROGAS', icon: 'fa-solid fa-pills' },
@@ -135,9 +160,12 @@
       { file: 'documento9.html', title: 'LEY DE VIOLENCIA EN LOS ESTADIOS', icon: 'fa-solid fa-futbol' },
       { file: 'documento10.html', title: 'LEY DE TRANSITO', icon: 'fa-solid fa-car' },
       { file: 'documento11.html', title: 'LEY ORGANICA DEL MINISTERIO PUBLICO', icon: 'fa-solid fa-building-columns' },
-      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
-      { url: 'minutas.html', title: 'Minutas de Jurisprudencia', icon: 'fa-solid fa-book-open' }
+      { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator', type: 'calculadora' },
+      { title: 'Minutas de Jurisprudencia', icon: 'fa-solid fa-book-open', type: 'minutas' }
     ];
+
+    // Minutas disponibles (se cargarán dinámicamente)
+    let minutas = [];
 
     // Construir la lista de documentos
     function buildDocList() {
@@ -145,15 +173,15 @@
       docs.forEach(doc => {
         const card = document.createElement('div');
         card.className = 'doc-item';
-        if (doc.title.includes('Calculadora')) card.classList.add('calculadora');
+        if (doc.type) card.classList.add(doc.type);
 
         card.innerHTML = `
           <div class="doc-icon"><i class="${doc.icon || 'fa-solid fa-book'}"></i></div>
           <div class="doc-title">${doc.title}</div>
         `;
 
-        if (doc.url) {
-          card.addEventListener('click', () => window.location.href = doc.url);
+        if (doc.type === 'minutas') {
+          card.addEventListener('click', () => showMinutas());
         } else {
           card.addEventListener('click', () => openDoc(doc.file, doc.title));
         }
@@ -162,27 +190,111 @@
       });
     }
 
-    // Resto de funciones: loadDocument, openDoc, goHome, búsqueda, filtros, toggles
-    async function loadDocument(file, title) {
+    // Cargar lista de minutas
+    async function loadMinutas() {
       try {
-        const res = await fetch('docs/' + file);
+        // Esta URL debería ser reemplazada por una que realmente liste los archivos
+        // Para esta demostración, simulamos que tenemos una API que lista archivos
+        const minutasFiles = [
+          { path: 'minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'N°2 - Control de identidad - Ley de tránsito' },
+          { path: 'minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'N°3 - Acceso a información en Facebook' },
+          { path: 'minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'N°32 - Instrucción sobre primeras diligencias' }
+          // En un entorno real, esta lista vendría de un endpoint del servidor
+        ];
+        
+        return minutasFiles;
+      } catch (err) {
+        console.error('Error cargando lista de minutas:', err);
+        return [];
+      }
+    }
+
+    // Mostrar la lista de minutas
+    async function showMinutas() {
+      docList.style.display = 'none';
+      minutasList.style.display = 'grid';
+      minutasList.innerHTML = '<div class="loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Cargando minutas...</div>';
+      
+      if (minutas.length === 0) {
+        minutas = await loadMinutas();
+      }
+      
+      renderMinutasList();
+    }
+
+    // Renderizar lista de minutas
+    function renderMinutasList() {
+      minutasList.innerHTML = '';
+      
+      if (minutas.length === 0) {
+        minutasList.innerHTML = '<div class="error"><p>No se pudieron cargar las minutas.</p></div>';
+        return;
+      }
+      
+      minutas.forEach(minuta => {
+        const card = document.createElement('div');
+        card.className = 'doc-item minutas';
+        
+        // Extraer título más limpio si es posible
+        let displayTitle = minuta.title;
+        
+        card.innerHTML = `
+          <div class="doc-icon"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="doc-title">${displayTitle}</div>
+        `;
+        
+        card.addEventListener('click', () => openMinuta(minuta.path, displayTitle));
+        
+        minutasList.appendChild(card);
+      });
+    }
+
+    // Abrir una minuta específica
+    function openMinuta(path, title) {
+      minutasList.style.display = 'none';
+      viewer.style.display = 'block';
+      viewToolbar.classList.add('hidden');
+      docToolbar.classList.remove('hidden');
+      docToolbar.classList.add('compact');
+      mainHeader.classList.add('compact');
+      mainContainer.classList.add('doc-mode');
+      docTitleHeader.textContent = title;
+      loadDocument(path, title, true);
+    }
+
+    // Cargar documento (HTML o Markdown)
+    async function loadDocument(file, title, isMinuta = false) {
+      try {
+        viewer.innerHTML = '<div class="loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Cargando documento...</div>';
+        
+        // Construir la ruta correcta según si es minuta o documento regular
+        const path = isMinuta ? `docs/${file}` : `docs/${file}`;
+        
+        const res = await fetch(path);
         if (!res.ok) {
           viewer.innerHTML = `<div class="error"><h2>Error ${res.status}</h2><p>No se pudo cargar el documento.</p></div>`;
           return;
         }
+        
         const txt = await res.text();
         document.title = `${title} - Biblioteca Jurídica ANF`;
+        
         let html;
-        if (file.endsWith('.md') || file.endsWith('.MD')) {
+        if (file.endsWith('.md') || file.endsWith('.MD') || isMinuta) {
+          // Procesar markdown
           html = marked.parse(txt);
         } else {
+          // Procesar HTML
           const p = new DOMParser();
           const docHtml = p.parseFromString(txt, 'text/html');
           if (docHtml.head) docHtml.head.querySelectorAll('style,link').forEach(e => e.remove());
           html = docHtml.body ? docHtml.body.innerHTML : txt;
         }
+        
         viewer.innerHTML = html;
         viewer.dataset.original = viewer.innerHTML;
+        
+        // Manejar scripts si existen
         viewer.querySelectorAll('script').forEach(oldScript => {
           const newScript = document.createElement('script');
           if (oldScript.src) newScript.src = oldScript.src;
@@ -190,9 +302,14 @@
           document.body.appendChild(newScript);
           oldScript.remove();
         });
+        
+        // Aplicar resaltado de sintaxis si hay bloques de código
         hljs.highlightAll();
+        
+        // Aplicar tamaño de fuente guardado
         const savedSize = localStorage.getItem('fontSize') || '16px';
         viewer.style.fontSize = savedSize;
+        
         resetSearch();
       } catch (err) {
         console.error('Error cargando documento:', err);
@@ -200,8 +317,10 @@
       }
     }
 
+    // Abrir documento HTML
     function openDoc(file, title) {
       docList.style.display = 'none';
+      minutasList.style.display = 'none';
       viewer.style.display = 'block';
       viewToolbar.classList.add('hidden');
       docToolbar.classList.remove('hidden');
@@ -212,9 +331,11 @@
       loadDocument(file, title);
     }
 
+    // Volver a la página principal
     function goHome() {
       document.title = 'Biblioteca Jurídica – ANF';
       viewer.style.display = 'none';
+      minutasList.style.display = 'none';
       docList.style.display = 'grid';
       docToolbar.classList.add('hidden');
       docToolbar.classList.remove('compact');
@@ -226,20 +347,27 @@
       resetSearch();
     }
 
+    // Variables para la búsqueda
     let highlights = [], currentHit = -1, lastTerm = '';
+    
+    // Escapa caracteres especiales para regex
     const escapeRx = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
+    // Resaltar términos de búsqueda
     function highlightTerm(root, term) {
       if (!term.trim()) return;
-      const rx = new RegExp(`(${term.replace(/[-/\\^$*+?.()|[\]{}]/g,'\\$&')})`, 'gi');
+      const rx = new RegExp(`(${escapeRx(term)})`, 'gi');
       const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
       const nodes = [];
       while (walker.nextNode()) nodes.push(walker.currentNode);
+      
       nodes.forEach(n => {
         const val = n.nodeValue;
         if (!rx.test(val)) return;
+        
         const frag = document.createDocumentFragment();
         let last = 0;
+        
         val.replace(rx, (m, _, off) => {
           if (off > last) frag.appendChild(document.createTextNode(val.slice(last, off)));
           const span = document.createElement('span');
@@ -248,11 +376,13 @@
           frag.appendChild(span);
           last = off + m.length;
         });
+        
         if (last < val.length) frag.appendChild(document.createTextNode(val.slice(last)));
         n.parentNode.replaceChild(frag, n);
       });
     }
 
+    // Desplazarse al resultado encontrado
     function scrollToHit(idx) {
       if (!highlights.length) return;
       currentHit = (idx + highlights.length) % highlights.length;
@@ -260,55 +390,102 @@
       resultCounter.textContent = `${currentHit + 1} de ${highlights.length}`;
     }
 
+    // Ejecutar búsqueda
     function doSearch() {
       const term = searchInput.value.trim();
-      if (!term) { resetSearch(); return; }
-      if (viewer.style.display !== 'block') {
-        filterDocuments(term); return;
+      
+      if (!term) { 
+        resetSearch(); 
+        return; 
       }
-      if (term === lastTerm && highlights.length) { scrollToHit(currentHit + 1); return; }
+      
+      // En la vista principal o de minutas, filtrar documentos
+      if (viewer.style.display !== 'block') {
+        filterDocuments(term); 
+        return;
+      }
+      
+      // En la vista de documento, buscar en el contenido
+      if (term === lastTerm && highlights.length) { 
+        scrollToHit(currentHit + 1); 
+        return; 
+      }
+      
       lastTerm = term;
       viewer.innerHTML = viewer.dataset.original;
       highlightTerm(viewer, term);
       highlights = Array.from(viewer.querySelectorAll('.highlight'));
-      if (highlights.length) { searchResults.style.display = 'flex'; scrollToHit(0); }
-      else { searchResults.style.display = 'none'; resultCounter.textContent = '0 de 0'; }
+      
+      if (highlights.length) { 
+        searchResults.style.display = 'flex'; 
+        scrollToHit(0); 
+      } else { 
+        searchResults.style.display = 'none'; 
+        resultCounter.textContent = '0 de 0'; 
+      }
     }
 
+    // Filtrar documentos o minutas según el término de búsqueda
     function filterDocuments(term) {
       const lowerTerm = term.toLowerCase();
-      const items = docList.querySelectorAll('.doc-item');
+      
+      // Determinar qué lista está visible
+      const currentList = docList.style.display !== 'none' ? docList : minutasList;
+      const items = currentList.querySelectorAll('.doc-item');
+      
       let visibleCount = 0;
+      
       items.forEach(item => {
         const title = item.querySelector('.doc-title').textContent.toLowerCase();
-        if (title.includes(lowerTerm)) { item.style.display = ''; visibleCount++; }
-        else item.style.display = 'none';
+        if (title.includes(lowerTerm)) { 
+          item.style.display = ''; 
+          visibleCount++; 
+        } else {
+          item.style.display = 'none';
+        }
       });
-      if (visibleCount === 0 && !docList.querySelector('.no-results')) {
+      
+      if (visibleCount === 0 && !currentList.querySelector('.no-results')) {
         const noResults = document.createElement('div');
         noResults.className = 'no-results';
         noResults.innerHTML = `<p style="text-align:center;padding:1rem;">No se encontraron documentos que coincidan con "${term}"</p>`;
-        docList.appendChild(noResults);
+        currentList.appendChild(noResults);
       } else if (visibleCount > 0) {
-        const nr = docList.querySelector('.no-results'); if (nr) nr.remove();
+        const nr = currentList.querySelector('.no-results'); 
+        if (nr) nr.remove();
       }
     }
 
+    // Reiniciar búsqueda
     function resetSearch() {
-      highlights = []; currentHit = -1; lastTerm = '';
+      highlights = []; 
+      currentHit = -1; 
+      lastTerm = '';
       searchResults.style.display = 'none';
     }
 
+    // Cambiar entre vista de cuadrícula y lista
     function toggleView(type) {
       const gridBtn = document.getElementById('grid-view-btn');
       const listBtn = document.getElementById('list-view-btn');
+      
+      // Aplicar cambio a la lista activa
+      const activeList = docList.style.display !== 'none' ? docList : minutasList;
+      
       if (type === 'grid') {
-        docList.className = 'doc-grid'; gridBtn.classList.add('active'); listBtn.classList.remove('active'); localStorage.setItem('viewMode','grid');
+        activeList.className = 'doc-grid'; 
+        gridBtn.classList.add('active'); 
+        listBtn.classList.remove('active'); 
+        localStorage.setItem('viewMode','grid');
       } else {
-        docList.className = 'doc-list'; listBtn.classList.add('active'); gridBtn.classList.remove('active'); localStorage.setItem('viewMode','list');
+        activeList.className = 'doc-list'; 
+        listBtn.classList.add('active'); 
+        gridBtn.classList.remove('active'); 
+        localStorage.setItem('viewMode','list');
       }
     }
 
+    // Event listeners
     document.getElementById('btn-back').addEventListener('click', goHome);
     document.getElementById('btn-font-increase').addEventListener('click', () => changeFont(1));
     document.getElementById('btn-font-decrease').addEventListener('click', () => changeFont(-1));
@@ -316,14 +493,37 @@
     document.getElementById('list-view-btn').addEventListener('click', () => toggleView('list'));
     document.getElementById('prev-result').addEventListener('click', () => scrollToHit(currentHit - 1));
     document.getElementById('next-result').addEventListener('click', () => scrollToHit(currentHit + 1));
-    document.getElementById('close-search').addEventListener('click', () => { searchInput.value=''; resetSearch(); if (viewer.dataset.original) viewer.innerHTML=viewer.dataset.original; });
-    searchInput.addEventListener('input', () => { clearTimeout(searchInput.timeout); searchInput.timeout = setTimeout(doSearch,300); });
-    searchInput.addEventListener('keydown', e => { if (e.key==='Enter') { clearTimeout(searchInput.timeout); doSearch(); }});
+    document.getElementById('close-search').addEventListener('click', () => { 
+      searchInput.value=''; 
+      resetSearch(); 
+      if (viewer.dataset.original) viewer.innerHTML=viewer.dataset.original; 
+    });
+    
+    searchInput.addEventListener('input', () => { 
+      clearTimeout(searchInput.timeout); 
+      searchInput.timeout = setTimeout(doSearch, 300); 
+    });
+    
+    searchInput.addEventListener('keydown', e => { 
+      if (e.key === 'Enter') { 
+        clearTimeout(searchInput.timeout); 
+        doSearch(); 
+      }
+    });
 
+    // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
       buildDocList();
-      const savedView = localStorage.getItem('viewMode'); if (savedView==='list') toggleView('list');
-      if ('serviceWorker' in navigator) navigator.serviceWorker.register('/service-worker.js').catch(err=>console.error(err));
+      const savedView = localStorage.getItem('viewMode'); 
+      if (savedView === 'list') toggleView('list');
+      
+      // Servicio worker para funcionamiento offline
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('Service Worker registrado'))
+          .catch(err => console.error('Error al registrar Service Worker:', err));
+      }
+      
       goHome();
     });
   </script>
