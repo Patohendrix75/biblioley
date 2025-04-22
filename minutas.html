@@ -88,6 +88,15 @@
   </div>
   <script>
   (function(){
+
+// Ocultar barras del navegador cuando se instala como PWA / acceso directo
+if (window.matchMedia('(display-mode: standalone)').matches) {
+  // Oculta el header superior si quieres modo «fullscreen»
+  document.querySelector('header').style.display = 'none';
+  // Ajusta toolbar para que quede pegada arriba
+  document.querySelector('.toolbar').style.marginTop = '0';
+}
+
     // Metadatos de las minutas con sus categorías
     let docs = [];
 
