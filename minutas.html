@@ -89,39 +89,7 @@
   <script>
   (function(){
     // Metadatos de las minutas con sus categorías
-    const docs = [
-      { path: 'docs/minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 03 – Acceso a información en Facebook', category: 'Diligencias e Investigación' },
-      { path: 'docs/minutas/N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 04 – Prueba posterior al cierre de la investigación', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 05 – Artículo 195 Ley 18.290 (Omisión de auxilio)', category: 'Delitos y Tipicidad' },
-      { path: 'docs/minutas/N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 06 – Revisión de teléfonos móviles incautados', category: 'Diligencias e Investigación' },
-      { path: 'docs/minutas/N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 07 – Primeras diligencias y GPS', category: 'Diligencias e Investigación' },
-      { path: 'docs/minutas/N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 08 – Efecto de la apelación de la revocación de pena sustitutiva', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 09 – Control de identidad en investigación en curso', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en porte o tenencia de armas', category: 'Delitos y Tipicidad' },
-      { path: 'docs/minutas/N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación provisional previa al informe psiquiátrico', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: necesidad de declaración previa', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de identidad (arrojar objeto)', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por videoconferencia', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de identidad y denuncia anónima', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°16__DETENCION_POR_GUARDIAS_DE_SEGURIDAD_O_MUNICIPALES.md', title: 'Minuta Nº 16 – Detención por guardias de seguridad o municipales', category: 'Detención y Aprehensión' },
-      { path: 'docs/minutas/N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_O_FRUSTRADOS.md', title: 'Minuta Nº 17 – Dolo eventual y delitos tentados o frustrados', category: 'Delitos y Tipicidad' },
-      { path: 'docs/minutas/N°18_DETENCION_POR_PARTICULARES.md', title: 'Minuta Nº 18 – Detención por particulares', category: 'Detención y Aprehensión' },
-      { path: 'docs/minutas/N°19_CONTROL_DE_IDENTIDAD_PREVENTIVO_QUE_MUTA_A_INVESTIGATIVO.md', title: 'Minuta Nº 19 – Control de identidad preventivo que muta a investigativo', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°20_CADENA_DE_CUSTODIA_Y_DEBIDO_PROCESO.md', title: 'Minuta Nº 20 – Cadena de custodia y debido proceso', category: 'Evidencia y Cadena de Custodia' },
-      { path: 'docs/minutas/N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title: 'Minuta Nº 21 – Control de identidad: olor a marihuana', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title: 'Minuta Nº 22 – Control de identidad y huida', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°23_CONTROL_IDENTIDAD_Y_CAN_DETECTOR_DE_DROGAS.md', title: 'Minuta Nº 23 – Control de identidad y can detector de drogas', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°24_Reclamos_por_infracción_de_garantías_de_terceros.md', title: 'Minuta Nº 24 – Reclamos por infracción de garantías de terceros', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°25_Porte_o_tenencia_de_una_munición.md', title: 'Minuta Nº 25 – Porte o tenencia de una munición', category: 'Delitos y Tipicidad' },
-      { path: 'docs/minutas/N°26_Delito_continuado_-_reiterado.md', title: 'Minuta Nº 26 – Delito continuado / reiterado', category: 'Delitos y Tipicidad' },
-      { path: 'docs/minutas/N°27_Control_de_identidad_-_Transacción_en_la_vía_pública.md', title: 'Minuta Nº 27 – Control de identidad: transacción en la vía pública', category: 'Control de Identidad' },
-      { path: 'docs/minutas/N°28_Obligatoriedad_del_artículo_302_del_CPP_durante_la_etapa_investigativa.md', title: 'Minuta Nº 28 – Oblig. art. 302 CPP en etapa investigativa', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°29_Abuso_sexual_-_Introducción_de_dedos.md', title: 'Minuta Nº 29 – Abuso sexual: introducción de dedos', category: 'Delitos y Tipicidad' },
-      { path: 'docs/minutas/N°30_Actuaciones_autónomas_de_Carabineros_en_marchas_y_manifestaciones.md', title: 'Minuta Nº 30 – Actuaciones autónomas de Carabineros en marchas y manifestaciones', category: 'Diligencias e Investigación' },
-      { path: 'docs/minutas/N°31_Retractación_Víctima_331_letra_f)_CPP.md', title: 'Minuta Nº 31 – Retractación de la víctima e incorporación de su declaración previa', category: 'Procedimiento y Garantías' },
-      { path: 'docs/minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'Minuta Nº 32 – Instrucción sobre primeras diligencias', category: 'Diligencias e Investigación' }
-    ];
+    let docs = [];
 
     // Referencias a elementos del DOM
     const docListEl = document.getElementById('minutas-docList');
@@ -144,16 +112,32 @@
     let currentDocument = null;
     let appState = 'home'; // Puede ser 'home' o 'viewer'
 
+    async function fetchDocumentList() {
+      try {
+          const response = await fetch('/list_project_files');
+          const data = await response.json();
+          const files = data.result;
+          docs = files.filter(file => file.startsWith('minutas/') && file.endsWith('.md')).map(file => {
+            const fileName = file.split('/').pop().replace('.md','');
+              return {
+                  path: `docs/${file}`,
+                  title: `Minuta Nº ${fileName}`,
+                  category: 'Minuta',
+              };
+          });
+      } catch (error) {
+        console.error('Error fetching document list:', error);
+        docs = [];
+    }
+    }
+
     // Renderiza las tarjetas de documentos
-    function renderDocuments() {
+    async function renderDocuments() {
       docListEl.innerHTML = '';
       const selectedCategory = filterEl.value;
-      
-      // Filtra los documentos según la categoría seleccionada
-      const filteredDocs = selectedCategory === 'all' 
-        ? docs 
-        : docs.filter(d => d.category === selectedCategory);
-      
+      await fetchDocumentList();
+      const filteredDocs = docs
+
       // Si no hay documentos, mostrar mensaje
       if (filteredDocs.length === 0) {
         docListEl.innerHTML = '<div class="no-results">No se encontraron documentos en esta categoría.</div>';
@@ -373,7 +357,7 @@
     // Inicialización
     function init() {
       setupEventListeners();
-      renderDocuments();
+      renderDocuments()
     }
 
     // Ejecutar cuando el DOM esté completamente cargado
