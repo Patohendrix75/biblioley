@@ -230,9 +230,11 @@
         viewer.style.fontSize = newSizeRem;
         
         // Guardar el tamaño de fuente para este documento
-        const currentPath = docs.find(d => d.title === docTitleHeader.textContent).file;
-        if (currentPath) {
-          localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
+        const currentDoc = docs.find(d => d.title === docTitleHeader.textContent);
+
+        if (currentDoc && currentDoc.file) {
+            localStorage.setItem(`fontSize-${currentDoc.file}`, newSizeRem);
+
         }
       }
     }    
