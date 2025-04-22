@@ -10,116 +10,36 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
   <style>
-    :root {
-      --primary: #1f334d;
-      --bg: #f5f7fa;
-      --text: #333;
-      --card-bg: #fff;
-      --radius: 12px;
-      --shadow: 0 2px 10px rgba(0,0,0,0.08);
-    }
+    :root { --primary: #1f334d; --bg: #f5f7fa; --text: #333; --card-bg: #fff; --radius: 12px; --shadow: 0 2px 10px rgba(0,0,0,0.08); }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      display: flex; flex-direction: column; height: 100vh;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: var(--bg); color: var(--text); overflow: hidden;
-    }
+    body { display: flex; flex-direction: column; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
     header { background: var(--primary); color: #fff; padding: 1rem; }
-    .title-bar { display: flex; align-items: center; }
-    .title-bar h1 { flex: 1; font-size: 1.4rem; font-weight: 600; }
-    .search-bar {
-      display: flex; align-items: center;
-      background: #fff; border-radius: 50px;
-      padding: 0.5rem 1rem; margin-top: 0.75rem;
-      box-shadow: var(--shadow);
-    }
-    .search-bar input {
-      flex: 1; border: none; outline: none;
-      font-size: 1rem; background: transparent;
-      padding: 0.25rem;
-    }
-    .search-icon { margin-right: 0.5rem; color: #666; }
-    .toolbar {
-      display: flex; align-items: center; justify-content: space-between;
-      background: #e8ebf0; padding: 0.75rem;
-      border-bottom: 1px solid rgba(0,0,0,0.1);
-    }
-    .view-btns { display: flex; gap: 0.5rem; }
-    .btn {
-      background: rgba(255,255,255,0.8); border: none; border-radius: 50%;
-      width: 40px; height: 40px; display: flex; align-items: center;
-      justify-content: center; box-shadow: var(--shadow);
-      color: var(--primary); font-size: 1.1rem; cursor: pointer;
-    }
-    .btn.active { background: var(--primary); color: #fff; }
-    .cat-filter {
-      margin-left: 1rem; padding: 0.3rem 0.6rem;
-      border: 1px solid #ccc; border-radius: 8px;
-      font-size: 0.9rem;
-    }
-    .container { flex: 1; overflow-y: auto; padding: 0.75rem; }
-    .doc-grid {
-      display: grid; grid-template-columns: repeat(2,1fr);
-      gap: 0.75rem;
-    }
+    header h1 { font-size: 1.4rem; margin: 0; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; background: #e8ebf0; padding: 0.75rem; }
+    .search-bar { flex: 1; display: flex; align-items: center; background: #fff; border-radius: 50px; padding: 0.5rem 1rem; box-shadow: var(--shadow); margin-right: 1rem; }
+    .search-bar .fa-magnifying-glass { margin-right: 0.5rem; color: #666; }
+    .search-bar input { flex: 1; border: none; outline: none; font-size: 1rem; background: transparent; }
+    .view-btns button { background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow); color: var(--primary); margin-right: 0.5rem; }
+    .view-btns button.active { background: var(--primary); color: #fff; }
+    .cat-filter { padding: 0.3rem 0.6rem; border: 1px solid #ccc; border-radius: 8px; font-size: 0.9rem; }
+    main { flex: 1; overflow-y: auto; padding: 0.75rem; }
+    .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
     .doc-list { display: flex; flex-direction: column; gap: 0.5rem; }
-    .doc-item {
-      background: var(--card-bg); border-radius: var(--radius);
-      padding: 1.25rem 0.75rem; display: flex; flex-direction: column;
-      align-items: center; gap: 0.75rem; box-shadow: var(--shadow);
-      border-top: 4px solid var(--primary); cursor: pointer;
-    }
+    .doc-item { background: var(--card-bg); border-radius: var(--radius); padding: 1.25rem 0.75rem; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; box-shadow: var(--shadow); cursor: pointer; border-top: 4px solid var(--primary); }
     .doc-icon { font-size: 2rem; color: var(--primary); }
-    .doc-title { text-align: center; font-weight: 600; font-size: 0.9rem; }
-    #viewer {
-      display: none; flex: 1; padding: 1rem; overflow-y: auto;
-      background: #fff; line-height: 1.5; font-size: 1rem;
-    }
+    .doc-title { text-align: center; font-weight: 600; font-size: 0.9rem; line-height: 1.3; }
+    #minutas-viewer { display: none; background: #fff; padding: 1rem; overflow-y: auto; }
     .highlight { background: #ffe169; padding: 0 2px; border-radius: 2px; }
-    .search-results {
-      position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
-      background: var(--primary); color: #fff; display: none;
-      align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 50px;
-      box-shadow: var(--shadow);
-    }
-    .search-results button {
-      background: rgba(255,255,255,0.2); border: none; border-radius: 50%;
-      width: 30px; height: 30px; display: flex; align-items: center;
-      justify-content: center; color: #fff; cursor: pointer;
-    }
-    .error-message {
-      background: #f8d7da; color: #721c24; padding: 1rem;
-      border-radius: var(--radius); margin: 1rem 0;
-      border-left: 4px solid #f5c6cb;
-    }
-    @media (max-width:480px) {
-      .doc-grid { grid-template-columns: 1fr; }
-      .btn { width: 36px; height: 36px; font-size: 1rem; }
-      .cat-filter { margin-top: 0.5rem; }
-    }
+    .search-results { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 50px; box-shadow: var(--shadow); display: none; }
+    .search-results button { background: rgba(255,255,255,0.2); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: #fff; }
   </style>
 </head>
 <body>
-  <header>
-    <div class="title-bar">
-      <h1>Minutas de Jurisprudencia</h1>
-    </div>
-    <div class="search-bar">
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input id="search" type="text" placeholder="Buscar en minutas..." />
-    </div>
-  </header>
-
-  <div class="toolbar" id="view-toolbar">
-    <div class="view-btns">
-      <button class="btn active" id="grid-view-btn" title="Vista en cuadrícula">
-        <i class="fa-solid fa-table-cells"></i>
-      </button>
-      <button class="btn" id="list-view-btn" title="Vista en lista">
-        <i class="fa-solid fa-list"></i>
-      </button>
-    </div>
-    <select id="catFilter" class="cat-filter">
+  <header><h1>Minutas de Jurisprudencia</h1></header>
+  <div class="toolbar">
+    <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input id="minutas-search" type="text" placeholder="Buscar en minutas..."/></div>
+    <div class="view-btns"><button id="minutas-grid-btn" class="active" title="Vista en cuadrícula"><i class="fa-solid fa-table-cells"></i></button><button id="minutas-list-btn" title="Vista en lista"><i class="fa-solid fa-list"></i></button></div>
+    <select id="minutas-catFilter" class="cat-filter">
       <option value="all">Todas las categorías</option>
       <option value="Control de Identidad">Control de Identidad</option>
       <option value="Detención y Aprehensión">Detención y Aprehensión</option>
@@ -129,175 +49,107 @@
       <option value="Delitos y Tipicidad">Delitos y Tipicidad</option>
     </select>
   </div>
-
-  <div class="container">
-    <div class="doc-grid" id="docList"></div>
-    <div id="viewer"></div>
-  </div>
-
-  <div class="search-results">
-    <button id="prev-result"><i class="fa-solid fa-chevron-up"></i></button>
-    <span id="result-counter">0 de 0</span>
-    <button id="next-result"><i class="fa-solid fa-chevron-down"></i></button>
-    <button id="close-search"><i class="fa-solid fa-xmark"></i></button>
-  </div>
-
+  <main>
+    <div id="minutas-docList" class="doc-grid"></div>
+    <div id="minutas-viewer"></div>
+  </main>
+  <div id="minutas-search-results" class="search-results"><button id="minutas-prev"><i class="fa-solid fa-chevron-up"></i></button><span id="minutas-counter">0 de 0</span><button id="minutas-next"><i class="fa-solid fa-chevron-down"></i></button><button id="minutas-close"><i class="fa-solid fa-xmark"></i></button></div>
   <script>
+  (function(){
     const docs = [
-      { file: 'N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)', icon: 'fa-solid fa-id-card', category: 'Control de Identidad' },
-      { file: 'N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 03 – Acceso a información en Facebook', icon: 'fa-brands fa-facebook', category: 'Procedimiento y Garantías' },
-      { file: 'N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 04 – Prueba incorporada después del cierre de la investigación', icon: 'fa-solid fa-vial', category: 'Evidencia y Cadena de Custodia' },
-      { file: 'N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 05 – Artículo 195 Ley 18.290 (Omisión de auxilio)', icon: 'fa-solid fa-ambulance', category: 'Delitos y Tipicidad' },
-      { file: 'N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 06 – Revisión de teléfonos móviles incautados', icon: 'fa-solid fa-mobile-screen-button', category: 'Diligencias e Investigación inicial' },
-      { file: 'N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 07 – Primeras diligencias y GPS', icon: 'fa-solid fa-map-pin', category: 'Diligencias e Investigación inicial' },
-      { file: 'N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 08 – Efecto de la apelación de la revocación de pena sustitutiva', icon: 'fa-solid fa-file-pen', category: 'Procedimiento y Garantías' },
-      { file: 'N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 09 – Control de identidad en investigación en curso', icon: 'fa-solid fa-user-secret', category: 'Control de Identidad' },
-      { file: 'N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en porte o tenencia de armas', icon: 'fa-solid fa-gun', category: 'Delitos y Tipicidad' },
-      { file: 'N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación provisional previa al informe psiquiátrico', icon: 'fa-solid fa-hospital-user', category: 'Procedimiento y Garantías' },
-      { file: 'N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: necesidad de declaración previa', icon: 'fa-solid fa-comment-dots', category: 'Procedimiento y Garantías' },
-      { file: 'N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de identidad (arrojar objeto)', icon: 'fa-solid fa-box', category: 'Control de Identidad' },
-      { file: 'N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por videoconferencia', icon: 'fa-solid fa-video', category: 'Procedimiento y Garantías' },
-      { file: 'N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de identidad y denuncia anónima', icon: 'fa-solid fa-user-secret', category: 'Control de Identidad' },
-      { file: 'N°16__DETENCION_POR_GUARDIAS_DE_SEGURIDAD_O_MUNICIPALES.md', title: 'Minuta Nº 16 – Detención por guardias de seguridad o municipales', icon: 'fa-solid fa-shield-halved', category: 'Detención y Aprehensión' },
-      { file: 'N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_O_FRUSTRADOS.md', title: 'Minuta Nº 17 – Dolo eventual y delitos tentados o frustrados', icon: 'fa-solid fa-brain', category: 'Delitos y Tipicidad' },
-      { file: 'N°18_DETENCION_POR_PARTICULARES.md', title: 'Minuta Nº 18 – Detención por particulares', icon: 'fa-solid fa-handshake', category: 'Detención y Aprehensión' },
-      { file: 'N°19_CONTROL_DE_IDENTIDAD_PREVENTIVO_QUE_MUTA_A_INVESTIGATIVO.md', title: 'Minuta Nº 19 – Control de identidad preventivo que muta a investigativo', icon: 'fa-solid fa-user-check', category: 'Control de Identidad' },
-      { file: 'N°20_CADENA_DE_CUSTODIA_Y_DEBIDO_PROCESO.md', title: 'Minuta Nº 20 – Cadena de custodia y debido proceso', icon: 'fa-solid fa-shield-check', category: 'Evidencia y Cadena de Custodia' },
-      { file: 'N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title: 'Minuta Nº 21 – Control de identidad: olor a marihuana', icon: 'fa-solid fa-smog', category: 'Control de Identidad' },
-      { file: 'N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title: 'Minuta Nº 22 – Control de identidad y huida', icon: 'fa-solid fa-person-running', category: 'Control de Identidad' },
-      { file: 'N°23_CONTROL_IDENTIDAD_Y_CAN_DETECTOR_DE_DROGAS.md', title: 'Minuta Nº 23 – Control de identidad y can detector de drogas', icon: 'fa-solid fa-dog', category: 'Control de Identidad' },
-      { file: 'N°24_Reclamos_por_infracción_de_garantías_de_terceros.md', title: 'Minuta Nº 24 – Reclamos por infracción de garantías de terceros', icon: 'fa-solid fa-gavel', category: 'Procedimiento y Garantías' },
-      { file: 'N°25_Porte_o_tenencia_de_una_munición.md', title: 'Minuta Nº 25 – Porte o tenencia de una munición', icon: 'fa-solid fa-bullet', category: 'Delitos y Tipicidad' },
-      { file: 'N°26_Delito_continuado_-_reiterado.md', title: 'Minuta Nº 26 – Delito continuado / reiterado', icon: 'fa-solid fa-repeat', category: 'Delitos y Tipicidad' },
-      { file: 'N°26-Delito-continuado-reiterado_.md', title: 'Minuta Nº 26b – Delito continuado / reiterado (duplicado)', icon: 'fa-solid fa-repeat', category: 'Delitos y Tipicidad' },
-      { file: 'N°27_Control_de_identidad_-_Transacción_en_la_vía_pública.md', title: 'Minuta Nº 27 – Control de identidad: transacción en la vía pública', icon: 'fa-solid fa-shopping-cart', category: 'Control de Identidad' },
-      { file: 'N°28_Obligatoriedad_del_artículo_302_del_CPP_durante_la_etapa_investigativa.md', title: 'Minuta Nº 28 – Oblig. art. 302 CPP en etapa investigativa', icon: 'fa-solid fa-file-contract', category: 'Procedimiento y Garantías' },
-      { file: 'N°29_Abuso_sexual_-_Introducción_de_dedos.md', title: 'Minuta Nº 29 – Abuso sexual: introducción de dedos', icon: 'fa-solid fa-hand-paper', category: 'Delitos y Tipicidad' },
-      { file: 'N°30_Actuaciones_autónomas_de_Carabineros_en_marchas_y_manifestaciones.md', title: 'Minuta Nº 30 – Actuaciones autónomas de Carabineros en marchas y manifestaciones', icon: 'fa-solid fa-police-car', category: 'Procedimiento y Garantías' },
-      { file: 'N°31_Retractación_Víctima_331_letra_f)_CPP.md', title: 'Minuta Nº 31 – Retractación de la víctima e incorporación de su declaración previa', icon: 'fa-solid fa-comment-slash', category: 'Evidencia y Cadena de Custodia' },
-      { file: 'N°32_Instrucción_sobre_primeras_diligencias.md', title: 'Minuta Nº 32 – Instrucción sobre primeras diligencias', icon: 'fa-solid fa-clipboard-list', category: 'Diligencias e Investigación inicial' }
+      { file: 'N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)', icon:'fa-solid fa-id-card', category:'Control de Identidad' },
+      { file: 'N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title:'Minuta Nº 03 – Acceso a información en Facebook', icon:'fa-brands fa-facebook', category:'Procedimiento y Garantías' },
+      { file: 'N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title:'Minuta Nº 04 – Prueba posterior al cierre de la investigación', icon:'fa-solid fa-vial', category:'Evidencia y Cadena de Custodia' },
+      { file: 'N°5_ARTICULO_195_LEY_18290.md', title:'Minuta Nº 05 – Art. 195 Ley 18.290 (Omisión de auxilio)', icon:'fa-solid fa-ambulance', category:'Delitos y Tipicidad' },
+      { file: 'N°6_REVISIÓN_DE_CELULARES.md', title:'Minuta Nº 06 – Revisión de celulares incautados', icon:'fa-solid fa-mobile-screen-button', category:'Diligencias e Investigación inicial' },
+      { file: 'N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title:'Minuta Nº 07 – Primeras diligencias y GPS', icon:'fa-solid fa-map-pin', category:'Diligencias e Investigación inicial' },
+      { file: 'N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title:'Minuta Nº 08 – Efecto apelación revocación pena sustitutiva', icon:'fa-solid fa-file-pen', category:'Procedimiento y Garantías' },
+      { file: 'N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title:'Minuta Nº 09 – Control identidad investigación en curso', icon:'fa-solid fa-user-secret', category:'Control de Identidad' },
+      { file: 'N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title:'Minuta Nº 10 – Coautoría porte o tenencia de armas', icon:'fa-solid fa-gun', category:'Delitos y Tipicidad' },
+      { file: 'N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title:'Minuta Nº 11 – Internación provisional previa informe psiquiátrico', icon:'fa-solid fa-hospital-user', category:'Procedimiento y Garantías' },
+      { file: 'N°12_TESTIGOS_NECESIDAD_DE_DECLARACION_PREVIA.md', title:'Minuta Nº 12 – Testigos: necesidad declaración previa', icon:'fa-solid fa-comment-dots', category:'Procedimiento y Garantías' },
+      { file: 'N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title:'Minuta Nº 13 – Control identidad (arrojar objeto)', icon:'fa-solid fa-box', category:'Control de Identidad' },
+      { file: 'N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title:'Minuta Nº 14 – Juicios por videoconferencia', icon:'fa-solid fa-video', category:'Procedimiento y Garantías' },
+      { file: 'N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANONIMA.md', title:'Minuta Nº 15 – Control identidad y denuncia anónima', icon:'fa-solid fa-user-secret', category:'Control de Identidad' },
+      { file: 'N°16_DETENCION_POR_GUARDIAS_SEGURIDAD_MUNICIPALES.md', title:'Minuta Nº 16 – Detención guardias seguridad municipales', icon:'fa-solid fa-shield-halved', category:'Detención y Aprehensión' },
+      { file: 'N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_FRUSTRADOS.md', title:'Minuta Nº 17 – Dolo eventual y delitos tentados/frustrados', icon:'fa-solid fa-brain', category:'Delitos y Tipicidad' },
+      { file: 'N°18_DETENCION_POR_PARTICULARES.md', title:'Minuta Nº 18 – Detención por particulares', icon:'fa-solid fa-handshake', category:'Detención y Aprehensión' },
+      { file: 'N°19_CONTROL_IDENTIDAD_PREVENTIVO_INVESTIGATIVO.md', title:'Minuta Nº 19 – Control identidad preventivo a investigativo', icon:'fa-solid fa-user-check', category:'Control de Identidad' },
+      { file: 'N°20_CADENA_CUSTODIA_Y_DEBIDO_PROCESO.md', title:'Minuta Nº 20 – Cadena custodia y debido proceso', icon:'fa-solid fa-shield-check', category:'Evidencia y Cadena de Custodia' },
+      { file: 'N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title:'Minuta Nº 21 – Control identidad: olor marihuana', icon:'fa-solid fa-smog', category:'Control de Identidad' },
+      { file: 'N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title:'Minuta Nº 22 – Control identité y huida', icon:'fa-solid fa-person-running', category:'Control de Identidad' },
+      { file: 'N°23_CONTROL_IDENTIDAD_CAN_DETECTOR_DROGAS.md', title:'Minuta Nº 23 – Control identidad y can detector drogas', icon:'fa-solid fa-dog', category:'Control de Identidad' },
+      { file: 'N°24_RECLAMOS_INFRACCION_GARANTIAS_TERCEROS.md', title:'Minuta Nº 24 – Reclamos infracción garantías terceros', icon:'fa-solid fa-gavel', category:'Procedimiento y Garantías' },
+      { file: 'N°25_PORTE_TENENCIA_MUNICION.md', title:'Minuta Nº 25 – Porte/tenencia munición', icon:'fa-solid fa-bullet', category:'Delitos y Tipicidad' },
+      { file: 'N°26_DELITO_CONTINUADO_REITERADO.md', title:'Minuta Nº 26 – Delito continuado/reiterado', icon:'fa-solid fa-repeat', category:'Delitos y Tipicidad' },
+      { file: 'N°27_CONTROL_IDENTIDAD_TRANSACCION_PUBLICA.md', title:'Minuta Nº 27 – Control identidad transacción pública', icon:'fa-solid fa-shopping-cart', category:'Control de Identidad' },
+      { file: 'N°28_OBLIGATORIEDAD_ART302_CPP_INVESTIGATIVA.md', title:'Minuta Nº 28 – Oblig. art. 302 CPP en fase investigación', icon:'fa-solid fa-file-contract', category:'Procedimiento y Garantías' },
+      { file: 'N°29_ABUSO_SEXUAL_INTRODUCCION_DE_DEDOS.md', title:'Minuta Nº 29 – Abuso sexual: introducción de dedos', icon:'fa-solid fa-hand-paper', category:'Delitos y Tipicidad' },
+      { file: 'N°30_ACTUACIONES_AUTONOMAS_CARABINEROS_MANIFESTACIONES.md', title:'Minuta Nº 30 – Actuaciones autónomas Carabineros manifestaciones', icon:'fa-solid fa-police-car', category:'Procedimiento y Garantías' },
+      { file: 'N°31_RETRACTACION_VICTIMA_DECLARACION_PREVIA.md', title:'Minuta Nº 31 – Retractación víctima e incorporación declaración previa', icon:'fa-solid fa-comment-slash', category:'Evidencia y Cadena de Custodia' },
+      { file: 'N°32_INSTRUCCION_PRIMERAS_DILIGENCIAS.md', title:'Minuta Nº 32 – Instrucción primeras diligencias', icon:'fa-solid fa-clipboard-list', category:'Diligencias e Investigación inicial' }
     ];
+    const listEl = document.getElementById('minutas-docList');
+    const viewerEl = document.getElementById('minutas-viewer');
+    const searchEl = document.getElementById('minutas-search');
+    const gridBtn = document.getElementById('minutas-grid-btn');
+    const listBtn = document.getElementById('minutas-list-btn');
+    const filterEl = document.getElementById('minutas-catFilter');
+    const prevBtn = document.getElementById('minutas-prev');
+    const nextBtn = document.getElementById('minutas-next');
+    const closeBtn = document.getElementById('minutas-close');
+    const counterEl = document.getElementById('minutas-counter');
 
-    // Construye la cuadrícula o lista según vista
-    function buildDocList() {
-      const list = document.getElementById('docList');
-      list.innerHTML = '';
-      const sel = document.getElementById('catFilter').value;
-      docs.forEach(doc => {
-        if (sel !== 'all' && doc.category !== sel) return;
+    function renderList() {
+      listEl.innerHTML = '';
+      const category = filterEl.value;
+      docs.forEach(d => {
+        if (category !== 'all' && d.category !== category) return;
         const card = document.createElement('div');
         card.className = 'doc-item';
-        card.innerHTML = `
-          <div class="doc-icon"><i class="${doc.icon}"></i></div>
-          <div class="doc-title">${doc.title}</div>
-        `;
-        card.addEventListener('click', () => openDoc(doc.file, doc.title));
-        list.appendChild(card);
+        card.innerHTML = `<div class="doc-icon"><i class="${d.icon}"></i></div><div class="doc-title">${d.title}</div>`;
+        card.addEventListener('click', () => openDoc(d.file, d.title));
+        listEl.appendChild(card);
       });
+      applyViewMode();
     }
-
-    // Carga y muestra el contenido del MD
-    async function loadDocument(file, title) {
-      const viewer = document.getElementById('viewer');
+    async function openDoc(file, title) {
+      listEl.style.display = 'none';
+      viewerEl.style.display = 'block';
+      viewerEl.innerHTML = '<p>Cargando...</p>';
       try {
-        // Mostrar mensaje de carga
-        viewer.innerHTML = '<p>Cargando documento...</p>';
-        
-        // Modificar la ruta para intentar cargar desde diferentes lugares
-        // Primero intentamos la ruta directa
         let res = await fetch(file);
-        
-        // Si falla, intentamos con minutas/
-        if (!res.ok) {
-          res = await fetch('minutas/' + file);
-        }
-        
-        // Si sigue fallando, intentamos con docs/minutas/
-        if (!res.ok) {
-          res = await fetch('docs/minutas/' + file);
-        }
-        
-        // Si sigue fallando, mostramos un error
-        if (!res.ok) {
-          throw new Error(`No se pudo cargar el documento. Código de error: ${res.status}`);
-        }
-        
+        if (!res.ok) res = await fetch('minutas/'+file);
         const text = await res.text();
-        const html = file.toLowerCase().endsWith('.md') ? marked.parse(text) : text;
-        viewer.innerHTML = html;
-        viewer.dataset.original = html;
-        hljs.highlightAll();
-      } catch (e) {
-        console.error("Error cargando documento:", e);
-        viewer.innerHTML = `
-          <div class="error-message">
-            <h3>Error al cargar el documento</h3>
-            <p>${e.message}</p>
-            <p>Verifica que el archivo exista y esté en la ubicación correcta.</p>
-          </div>
-        `;
+        const html = marked.parse(text);
+        viewerEl.innerHTML = html;
+        viewerEl.dataset.original = html;
+        highlightJsInit();
+      } catch(e) {
+        viewerEl.innerHTML = '<p>Error cargando minuta.</p>';
       }
     }
-
-    function openDoc(file, title) {
-      document.getElementById('docList').style.display = 'none';
-      const v = document.getElementById('viewer');
-      v.style.display = 'block';
-      loadDocument(file, title);
-    }
-
-    function doSearch() {
-      const term = document.getElementById('search').value.trim().toLowerCase();
-      if (!term) { buildDocList(); return; }
-      const inViewer = document.getElementById('viewer').style.display === 'block';
-      if (inViewer) {
-        const html = document.getElementById('viewer').dataset.original;
-        document.getElementById('viewer').innerHTML = html;
-        const spans = [];
-        const rx = new RegExp(`(${term})`, 'gi');
-        document.querySelectorAll('#viewer *').forEach(node => {
-          if (node.nodeType === Node.TEXT_NODE) return;
-          node.childNodes.forEach(c => {
-            if (c.nodeType === Node.TEXT_NODE && rx.test(c.textContent)) {
-              const frag = document.createDocumentFragment();
-              c.textContent.split(rx).forEach(part => {
-                if (rx.test(part)) {
-                  const s = document.createElement('span');
-                  s.className = 'highlight';
-                  s.textContent = part;
-                  frag.appendChild(s);
-                } else {
-                  frag.appendChild(document.createTextNode(part));
-                }
-              });
-              node.replaceChild(frag, c);
-            }
-          });
-        });
+    function applyViewMode() {
+      if (gridBtn.classList.contains('active')) {
+        listEl.className = 'doc-grid';
       } else {
-        // Filtra tarjetas
-        document.querySelectorAll('.doc-item').forEach(card => {
-          const t = card.querySelector('.doc-title').textContent.toLowerCase();
-          card.style.display = t.includes(term) ? '' : 'none';
-        });
+        listEl.className = 'doc-list';
       }
     }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      buildDocList();
-      document.getElementById('catFilter').addEventListener('change', buildDocList);
-      document.getElementById('grid-view-btn').addEventListener('click', () => {
-        document.getElementById('docList').className = 'doc-grid';
-        document.getElementById('grid-view-btn').classList.add('active');
-        document.getElementById('list-view-btn').classList.remove('active');
+    searchEl.addEventListener('input', () => {
+      const term = searchEl.value.toLowerCase();
+      Array.from(listEl.children).forEach(card => {
+        const txt = card.textContent.toLowerCase();
+        card.style.display = txt.includes(term) ? '' : 'none';
       });
-      document.getElementById('list-view-btn').addEventListener('click', () => {
-        document.getElementById('docList').className = 'doc-list';
-        document.getElementById('list-view-btn').classList.add('active');
-        document.getElementById('grid-view-btn').classList.remove('active');
-      });
-      document.getElementById('search').addEventListener('input', () => setTimeout(doSearch, 300));
     });
+    filterEl.addEventListener('change', renderList);
+    gridBtn.addEventListener('click', () => { gridBtn.classList.add('active'); listBtn.classList.remove('active'); applyViewMode(); });
+    listBtn.addEventListener('click', () => { listBtn.classList.add('active'); gridBtn.classList.remove('active'); applyViewMode(); });
+    closeBtn.addEventListener('click', () => { viewerEl.style.display='none'; listEl.style.display='grid'; });
+    function highlightJsInit() { if (window.hljs) hljs.highlightAll(); }
+    document.addEventListener('DOMContentLoaded', renderList);
+  })();
   </script>
 </body>
 </html>
