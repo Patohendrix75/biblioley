@@ -28,7 +28,7 @@
     .doc-list .doc-item{padding:0.5rem;}
     .doc-icon{font-size:1.8rem;margin-bottom:0.5rem;}
     .doc-title{font-weight:600;text-align:center;font-size:1rem;}
-    #viewer{display:none;flex:1;padding:1rem;background:#fff;overflow-y:auto;}
+    #viewer{display:none;flex:1;padding:1rem;background:#fff;overflow-y:auto;font-size:16px;line-height:1.5;}
     #doc-toolbar{display:none;align-items:center;gap:0.5rem;background:#e8ebf0;padding:0.5rem 1rem;}
     #doc-toolbar .btn{margin-right:0.5rem;}
     .search-results{display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.5rem;border-radius:50px;align-items:center;gap:0.5rem;box-shadow:var(--shadow);z-index:1000;}
@@ -36,6 +36,15 @@
     /* Estilos específicos para los resaltados de búsqueda */
     mark.highlight{background-color:yellow;color:black;}
     mark.highlight.current{background-color:orange;color:black;}
+    /* Indicador de zoom */
+    #zoom-level {
+      margin: 0 8px;
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -56,6 +65,7 @@
   <div class="toolbar" id="doc-toolbar">
     <button class="btn" id="btn-back" title="Volver"><i class="fa-solid fa-house"></i></button>
     <button class="btn" id="btn-font-decrease" title="Reducir texto"><i class="fa-solid fa-minus"></i></button>
+    <span id="zoom-level">100%</span>
     <button class="btn" id="btn-font-increase" title="Aumentar texto"><i class="fa-solid fa-plus"></i></button>
   </div>
   <div class="container" id="main-container">
@@ -82,6 +92,7 @@
     const closeBtn = document.querySelector('.search-results #close-search');
     const counter = document.getElementById('result-counter');
     const searchResults = document.querySelector('.search-results');
+    const zoomLevel = document.getElementById('zoom-level');
 
     const docs = [
       { file: 'docs/documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
@@ -101,6 +112,7 @@
     let minutas = [];
     let highlights = [], current = -1, lastTerm = '';
     let currentFontSize = 16;
+    let baseFontSize = 16; // Tamaño base para cálculos de porcentaje
     // Para rastrear si estamos realizando una búsqueda
     let isSearching = false;
 
@@ -166,14 +178,54 @@
       docToolbar.style.display = 'flex'; 
       docTitleHeader.textContent = title;
       
-      // Detectar el tamaño de fuente guardado o usar el predeterminado
-      const savedFontSize = localStorage.getItem(`fontSize-${path}`) || '1rem';
-        viewer.style.fontSize = savedFontSize;
-        // Establecer el tamaño actual en caso de que no se haya definido
-      currentFontSize = parseFloat(savedFontSize) * 16;
-
+      // Restaurar el tamaño de fuente guardado o usar el predeterminado
+      const savedFontSize = localStorage.getItem(`fontSize-${path}`);
+      if (savedFontSize) {
+        // Extraer el valor numérico para actualizar currentFontSize
+        currentFontSize = parseInt(savedFontSize);
+        if (isNaN(currentFontSize)) currentFontSize = 16; // Valor por defecto
+      } else {
+        // Establecer tamaño predeterminado
+        currentFontSize = 16;
+      }
+      
+      // Aplicar el tamaño de fuente
+      applyFontSize();
+      
+      // Cargar el documento
       loadDocument(path);
-    }    
+    }
+
+    function applyFontSize() {
+      // Aplicar el tamaño de fuente al contenedor
+      viewer.style.fontSize = currentFontSize + 'px';
+      
+      // Actualizar el indicador de zoom
+      const zoomPercentage = Math.round((currentFontSize / baseFontSize) * 100);
+      zoomLevel.textContent = zoomPercentage + '%';
+    }
+
+    function changeFont(dir) {
+      // Calcular el nuevo tamaño
+      const newSize = currentFontSize + dir * 2;
+      
+      // Validar el rango (para evitar tamaños extremos)
+      if (newSize < 8 || newSize > 40) return;
+      
+      // Actualizar la variable de seguimiento
+      currentFontSize = newSize;
+      
+      // Aplicar el cambio
+      applyFontSize();
+      
+      // Guardar el tamaño para este documento específico
+      const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file || 
+                        minutas.find(m => m.title === docTitleHeader.textContent)?.path;
+      
+      if (currentPath) {
+        localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
+      }
+    }
 
     async function loadDocument(path) {
       viewer.innerHTML = '<p>Cargando...</p>';
@@ -200,9 +252,6 @@
         }, 100);
       } catch (error) {
         viewer.innerHTML = `<p>Error al cargar: ${error.message}</p>`;
-        
-        
-        
         console.error("Error cargando documento:", error);
       }
     }
@@ -213,31 +262,13 @@
       
       // Guardar el tamaño de fuente actual si hay un documento abierto
       if (viewer.style.display === 'block' && docTitleHeader.textContent) {
-        const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file;
+        const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file || 
+                          minutas.find(m => m.title === docTitleHeader.textContent)?.path;
         if (currentPath) {
           localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
         }
       }
     }
-
-    function changeFont(dir) {
-        
-        const newSize = currentFontSize + dir * 2;
-        const newSizeRem = newSize/16 + "rem";
-
-        if (newSize !== currentFontSize) {
-        currentFontSize = newSize;
-        viewer.style.fontSize = newSizeRem;
-        
-        // Guardar el tamaño de fuente para este documento
-        const currentDoc = docs.find(d => d.title === docTitleHeader.textContent);
-
-        if (currentDoc && currentDoc.file) {
-            localStorage.setItem(`fontSize-${currentDoc.file}`, newSizeRem);
-
-        }
-      }
-    }    
 
     function resetSearch() {
       // Limpiar estado de búsqueda
@@ -499,6 +530,27 @@
           doSearch();
         } else {
           filterDocuments(searchInput.value);
+        }
+      }
+    });
+    
+    // Agregar soporte para zoom con Ctrl + rueda del ratón
+    viewer.addEventListener('wheel', (e) => {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        changeFont(e.deltaY > 0 ? -1 : 1);
+      }
+    });
+    
+    // Agregar soporte para atajos de teclado Ctrl+ y Ctrl-
+    document.addEventListener('keydown', (e) => {
+      if (viewer.style.display === 'block' && e.ctrlKey) {
+        if (e.key === '+' || e.key === '=') {
+          e.preventDefault();
+          changeFont(1);
+        } else if (e.key === '-') {
+          e.preventDefault();
+          changeFont(-1);
         }
       }
     });
