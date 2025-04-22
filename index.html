@@ -438,7 +438,13 @@
         card.innerHTML = `
           <div class="doc-icon"><i class="${doc.icon || 'fa-solid fa-book'}"></i></div>
           <div class="doc-title">${doc.title}</div>`;
-        card.addEventListener('click', () => openDoc(doc.file, doc.title));
+        card.addEventListener('click', () => {
+          if (doc.file === 'minutas.html') {
+            window.location.href = doc.file;
+          } else {
+            openDoc(doc.file, doc.title);
+          }
+        });
         docList.appendChild(card);
       });
     }
