@@ -169,10 +169,10 @@
       // Detectar el tamaño de fuente guardado o usar el predeterminado
       const savedFontSize = localStorage.getItem(`fontSize-${path}`);
       currentFontSize = savedFontSize ? parseInt(savedFontSize) : 16;
-      viewer.style.fontSize = currentFontSize + 'px';
+      viewer.style.fontSize = currentFontSize/16 + 'rem';
       
       loadDocument(path);
-    }
+    }    
 
     async function loadDocument(path) {
       viewer.innerHTML = '<p>Cargando...</p>';
@@ -186,6 +186,7 @@
         // Almacenar el contenido original como propiedad en lugar de atributo data
         // para evitar problemas con documentos grandes
         viewer._originalContent = html;
+        
         viewer.innerHTML = html;
         
         // Aplicar resaltado de código después de cargar el contenido
@@ -198,6 +199,9 @@
         }, 100);
       } catch (error) {
         viewer.innerHTML = `<p>Error al cargar: ${error.message}</p>`;
+        
+        
+        
         console.error("Error cargando documento:", error);
       }
     }
@@ -216,11 +220,10 @@
     }
 
     function changeFont(dir) {
-      // Limitar el tamaño de fuente entre 12px y 24px
-      const newSize = Math.min(24, Math.max(12, currentFontSize + dir*2));
-      if (newSize !== currentFontSize) {
+        const newSize = currentFontSize + dir * 2;
+        if (newSize !== currentFontSize) {
         currentFontSize = newSize;
-        viewer.style.fontSize = currentFontSize + 'px';
+        viewer.style.fontSize = currentFontSize/16 + 'rem';
         
         // Guardar el tamaño de fuente para este documento
         const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file;
@@ -228,7 +231,7 @@
           localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
         }
       }
-    }
+    }    
 
     function resetSearch() {
       // Limpiar estado de búsqueda
