@@ -167,10 +167,11 @@
       docTitleHeader.textContent = title;
       
       // Detectar el tamaño de fuente guardado o usar el predeterminado
-      const savedFontSize = localStorage.getItem(`fontSize-${path}`);
-      currentFontSize = savedFontSize ? parseInt(savedFontSize) : 16;
-      viewer.style.fontSize = currentFontSize/16 + 'rem';
-      
+      const savedFontSize = localStorage.getItem(`fontSize-${path}`) || '1rem';
+        viewer.style.fontSize = savedFontSize;
+        // Establecer el tamaño actual en caso de que no se haya definido
+      currentFontSize = parseFloat(savedFontSize) * 16;
+
       loadDocument(path);
     }    
 
@@ -220,13 +221,16 @@
     }
 
     function changeFont(dir) {
+        
         const newSize = currentFontSize + dir * 2;
+        const newSizeRem = newSize/16 + "rem";
+
         if (newSize !== currentFontSize) {
         currentFontSize = newSize;
-        viewer.style.fontSize = currentFontSize/16 + 'rem';
+        viewer.style.fontSize = newSizeRem;
         
         // Guardar el tamaño de fuente para este documento
-        const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file;
+        const currentPath = docs.find(d => d.title === docTitleHeader.textContent).file;
         if (currentPath) {
           localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
         }
