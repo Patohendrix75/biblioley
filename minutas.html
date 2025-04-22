@@ -188,7 +188,7 @@
         errorMessage.style.display = 'none';
         
         // Intenta cargar el documento
-        const response = await fetch(doc.path);
+        const response = await fetch(encodeURI(doc.path));
         
         // Verifica si la respuesta fue exitosa
         if (!response.ok) {
