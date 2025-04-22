@@ -395,6 +395,7 @@
   <script>
     // Definición de documentos con sus propiedades
     const docs = [
+  { file: 'minutas.html', title: 'Minutas Jurisprudencia', icon: 'fa-solid fa-book-bookmark' },
 
       
 { file: 'documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
@@ -408,7 +409,6 @@
       { file: 'documento9.html', title: 'LEY DE VIOLENCIA EN LOS ESTADIOS', icon: 'fa-solid fa-futbol' },
       { file: 'documento10.html', title: 'LEY DE TRANSITO', icon: 'fa-solid fa-car' },
       { file: 'documento11.html', title: 'LEY ORGANICA DEL MINISTERIO PUBLICO', icon: 'fa-solid fa-building-columns' },
-      { file: 'minutas.html', title: 'Minutas Jurisprudencia', icon: 'fa-solid fa-book-bookmark' },
     
       { file: 'calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator' },
 ];
@@ -446,7 +446,9 @@
     // Cargar un documento
     async function loadDocument(file, title) {
       try {
-        const res = await fetch('docs/' + file);
+        // Determinar ruta: si es minutas.html, cargar desde root, sino desde docs/
+        const url = file === 'minutas.html' ? file : ('docs/' + file);
+        const res = await fetch(url);
         if (!res.ok) {
           viewer.innerHTML = `<div class="error"><h2>Error ${res.status}</h2><p>No se pudo cargar el documento.</p></div>`;
           return;
