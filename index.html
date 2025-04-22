@@ -31,8 +31,9 @@
     #viewer{display:none;flex:1;padding:1rem;background:#fff;overflow-y:auto;}
     #doc-toolbar{display:none;align-items:center;gap:0.5rem;background:#e8ebf0;padding:0.5rem 1rem;}
     #doc-toolbar .btn{margin-right:0.5rem;}
-    .search-results{display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.5rem;border-radius:50px;display:flex;align-items:center;gap:0.5rem;box-shadow:var(--shadow);}
+    .search-results{display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.5rem;border-radius:50px;align-items:center;gap:0.5rem;box-shadow:var(--shadow);}
     .search-results button{background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;}
+    .highlight{background-color:yellow;color:black;}
   </style>
 </head>
 <body>
@@ -78,6 +79,7 @@
     const nextBtn = document.getElementById('next-result');
     const closeBtn = document.querySelector('.search-results #close-search');
     const counter = document.getElementById('result-counter');
+    const searchResults = document.querySelector('.search-results');
 
     const docs = [
       { file: 'docs/documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
@@ -96,6 +98,7 @@
     ];
     let minutas = [];
     let highlights = [], current = -1, lastTerm = '';
+    let currentFontSize = 16;
 
     function buildDocList() {
       docList.innerHTML = '';
@@ -117,8 +120,10 @@
     }
 
     async function showMinutas() {
-      docList.style.display = 'none'; viewToolbar.style.display = 'none';
-      minList.style.display = 'grid'; minList.innerHTML = '<p>Cargando minutas...</p>';
+      docList.style.display = 'none'; 
+      viewToolbar.style.display = 'none';
+      minList.style.display = 'grid'; 
+      minList.innerHTML = '<p>Cargando minutas...</p>';
       if (!minutas.length) minutas = await loadMinutas();
       renderMinutasList();
     }
@@ -135,9 +140,15 @@
     }
 
     function openDoc(path, title) {
-      docList.style.display = 'none'; minList.style.display = 'none';
-      viewer.style.display = 'block'; viewToolbar.style.display = 'none';
-      docToolbar.style.display = 'flex'; docTitleHeader.textContent = title;
+      docList.style.display = 'none'; 
+      minList.style.display = 'none';
+      viewer.style.display = 'block'; 
+      viewToolbar.style.display = 'none';
+      docToolbar.style.display = 'flex'; 
+      docTitleHeader.textContent = title;
+      // Reiniciar el tamaño de fuente al abrir un nuevo documento
+      currentFontSize = 16;
+      viewer.style.fontSize = currentFontSize + 'px';
       loadDocument(path);
     }
 
@@ -147,51 +158,191 @@
         const res = await fetch(path);
         const txt = await res.text();
         const html = path.endsWith('.md') ? marked.parse(txt) : txt;
-        viewer.innerHTML = html; viewer.dataset.original = html; highlightAll();
+        viewer.innerHTML = html; 
+        viewer.dataset.original = html; 
+        highlightAll();
       } catch {
         viewer.innerHTML = '<p>Error al cargar.</p>';
       }
     }
 
-    function highlightAll(){ if(window.hljs) hljs.highlightAll(); }
+    function highlightAll(){ 
+      if(window.hljs) hljs.highlightAll(); 
+    }
 
     function changeFont(dir) {
-      const size = parseInt(getComputedStyle(viewer).fontSize) || 16;
-      const newSize = Math.min(24, Math.max(12, size + dir*2));
-      viewer.style.fontSize = newSize+'px';
+      currentFontSize = Math.min(24, Math.max(12, currentFontSize + dir*2));
+      viewer.style.fontSize = currentFontSize + 'px';
     }
 
     function resetSearch() {
-      highlights=[]; current=-1; lastTerm=''; document.querySelector('.search-results').style.display='none';
+      highlights = []; 
+      current = -1; 
+      lastTerm = ''; 
+      searchResults.style.display = 'none';
     }
 
     function doSearch() {
       const term = searchInput.value.trim();
-      if (!term) return resetSearch();
-      if (viewer.style.display==='block') {
-        if (term===lastTerm&&highlights.length) return scrollHit(current+1);
-        lastTerm=term; viewer.innerHTML=viewer.dataset.original;
-        const rx=new RegExp(`(${term})`,'gi'); const walker=document.createTreeWalker(viewer,NodeFilter.SHOW_TEXT); const nodes=[];
-        while(walker.nextNode()) nodes.push(walker.currentNode);
-        nodes.forEach(n=>{ const val=n.nodeValue; if(!rx.test(val)) return; let last=0; const frag=document.createDocumentFragment(); val.replace(rx,(m,p,off)=>{ if(off>last) frag.appendChild(document.createTextNode(val.slice(last,off))); const sp=document.createElement('span');sp.className='highlight';sp.textContent=m;frag.appendChild(sp); last=off+m.length; }); if(last<val.length)frag.appendChild(document.createTextNode(val.slice(last))); n.parentNode.replaceChild(frag,n);
-        }); highlights=Array.from(viewer.querySelectorAll('.highlight'));
-        if(highlights.length){ document.querySelector('.search-results').style.display='flex'; scrollHit(0);} }
+      if (!term) {
+        resetSearch();
+        return;
+      }
+      
+      if (viewer.style.display === 'block') {
+        // Si es la misma búsqueda y ya tenemos resultados, sólo navega al siguiente
+        if (term === lastTerm && highlights.length) {
+          scrollHit(current + 1);
+          return;
+        }
+        
+        // Nueva búsqueda
+        lastTerm = term;
+        
+        // Restaurar contenido original antes de buscar nuevamente
+        viewer.innerHTML = viewer.dataset.original;
+        
+        // Crear expresión regular para la búsqueda
+        const regex = new RegExp(`(${term})`, 'gi');
+        
+        // Recorrer todos los nodos de texto
+        const walker = document.createTreeWalker(viewer, NodeFilter.SHOW_TEXT);
+        const nodes = [];
+        while (walker.nextNode()) {
+          nodes.push(walker.currentNode);
+        }
+        
+        // Procesar cada nodo y resaltar coincidencias
+        nodes.forEach(node => {
+          const text = node.nodeValue;
+          if (!regex.test(text)) return;
+          
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          
+          // Reset regex lastIndex
+          regex.lastIndex = 0;
+          
+          while ((match = regex.exec(text)) !== null) {
+            // Texto antes del match
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
+            }
+            
+            // El texto coincidente resaltado
+            const highlightSpan = document.createElement('span');
+            highlightSpan.className = 'highlight';
+            highlightSpan.textContent = match[0];
+            fragment.appendChild(highlightSpan);
+            
+            lastIndex = regex.lastIndex;
+          }
+          
+          // Texto después del último match
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
+          }
+          
+          // Reemplazar el nodo original con el fragmento
+          node.parentNode.replaceChild(fragment, node);
+        });
+        
+        // Recolectar todos los elementos resaltados
+        highlights = Array.from(viewer.querySelectorAll('.highlight'));
+        
+        // Mostrar resultados si hay coincidencias
+        if (highlights.length) {
+          searchResults.style.display = 'flex';
+          scrollHit(0);
+        } else {
+          searchResults.style.display = 'none';
+          counter.textContent = '0 de 0';
+        }
+      }
     }
 
-    function scrollHit(idx){ current=(idx+highlights.length)%highlights.length; highlights[current].scrollIntoView({behavior:'smooth',block:'center'}); counter.textContent=`${current+1} de ${highlights.length}`; }
+    function scrollHit(idx) {
+      if (highlights.length === 0) return;
+      
+      current = (idx + highlights.length) % highlights.length;
+      
+      // Eliminar resaltado activo anterior
+      highlights.forEach(h => h.style.backgroundColor = 'yellow');
+      
+      // Resaltar el actual más intensamente
+      highlights[current].style.backgroundColor = 'orange';
+      
+      // Scroll al elemento
+      highlights[current].scrollIntoView({behavior: 'smooth', block: 'center'});
+      
+      // Actualizar contador
+      counter.textContent = `${current + 1} de ${highlights.length}`;
+    }
 
-    function filterDocuments(term){ const lower=term.toLowerCase(); docList.style.display='grid'; Array.from(docList.children).forEach(c=>{ const t=c.querySelector('.doc-title').textContent.toLowerCase(); c.style.display=t.includes(lower)?'':'none'; }); }
+    function filterDocuments(term) {
+      const lower = term.toLowerCase();
+      docList.style.display = 'grid';
+      Array.from(docList.children).forEach(card => {
+        const title = card.querySelector('.doc-title').textContent.toLowerCase();
+        card.style.display = title.includes(lower) ? '' : 'none';
+      });
+    }
 
-    document.getElementById('btn-back').onclick=()=>{ viewer.style.display='none'; docToolbar.style.display='none'; docList.style.display='grid'; viewToolbar.style.display='flex'; docTitleHeader.textContent=''; searchInput.value=''; resetSearch(); };
-    document.getElementById('btn-font-increase').onclick=()=>changeFont(1);
-    document.getElementById('btn-font-decrease').onclick=()=>changeFont(-1);
-    document.getElementById('grid-view-btn').onclick=()=>{ docList.className='doc-grid'; document.getElementById('grid-view-btn').classList.add('active'); document.getElementById('list-view-btn').classList.remove('active'); localStorage.setItem('viewMode','grid'); };
-    document.getElementById('list-view-btn').onclick=()=>{ docList.className='doc-list'; document.getElementById('list-view-btn').classList.add('active'); document.getElementById('grid-view-btn').classList.remove('active'); localStorage.setItem('viewMode','list'); };
-    prevBtn.onclick=()=>scrollHit(current-1);
-    nextBtn.onclick=()=>scrollHit(current+1);
-    closeBtn.onclick=()=>{ searchInput.value=''; resetSearch(); viewer.innerHTML=viewer.dataset.original; };
-    searchInput.addEventListener('input',()=>{ clearTimeout(searchInput._t); searchInput._t=setTimeout(()=>{ if(viewer.style.display==='block')doSearch(); else filterDocuments(searchInput.value); },300); });
-    document.addEventListener('DOMContentLoaded',()=>{ buildDocList(); const v=localStorage.getItem('viewMode'); if(v==='list')document.getElementById('list-view-btn').click(); });
+    document.getElementById('btn-back').onclick = () => {
+      viewer.style.display = 'none';
+      docToolbar.style.display = 'none';
+      docList.style.display = 'grid';
+      viewToolbar.style.display = 'flex';
+      docTitleHeader.textContent = '';
+      searchInput.value = '';
+      resetSearch();
+    };
+    
+    document.getElementById('btn-font-increase').onclick = () => changeFont(1);
+    document.getElementById('btn-font-decrease').onclick = () => changeFont(-1);
+    
+    document.getElementById('grid-view-btn').onclick = () => {
+      docList.className = 'doc-grid';
+      document.getElementById('grid-view-btn').classList.add('active');
+      document.getElementById('list-view-btn').classList.remove('active');
+      localStorage.setItem('viewMode', 'grid');
+    };
+    
+    document.getElementById('list-view-btn').onclick = () => {
+      docList.className = 'doc-list';
+      document.getElementById('list-view-btn').classList.add('active');
+      document.getElementById('grid-view-btn').classList.remove('active');
+      localStorage.setItem('viewMode', 'list');
+    };
+    
+    prevBtn.onclick = () => scrollHit(current - 1);
+    nextBtn.onclick = () => scrollHit(current + 1);
+    
+    closeBtn.onclick = () => {
+      searchInput.value = '';
+      resetSearch();
+      viewer.innerHTML = viewer.dataset.original;
+    };
+    
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchInput._t);
+      searchInput._t = setTimeout(() => {
+        if (viewer.style.display === 'block') {
+          doSearch();
+        } else {
+          filterDocuments(searchInput.value);
+        }
+      }, 300);
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      buildDocList();
+      const viewMode = localStorage.getItem('viewMode');
+      if (viewMode === 'list') {
+        document.getElementById('list-view-btn').click();
+      }
+    });
   </script>
 </body>
 </html>
