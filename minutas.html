@@ -113,16 +113,23 @@
     let appState = 'home'; // Puede ser 'home' o 'viewer'
 
     async function fetchDocumentList() {
-      let response = await fetch('/list_project_files');
-        const data = await response.json();
-        const files = data.result;
-        const filteredFiles = files.filter(file => file.startsWith('minutas/') && file.endsWith('.md'));
-      try {
-          docs = filteredFiles.map(file => {
-            const fileName = file.split('/').pop().replace('.md','');
-            const num = fileName.split('_')[0];
-            return {
-                  path: `${file}`,
+      docs = [
+        { path: 'minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 2 – Control de Identidad y Ley de Tránsito', category: 'Control de Identidad' },
+        { path: 'minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 3 – Acceso a Información en Facebook', category: 'Diligencias e Investigación' },
+        { path: 'minutas/N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 4 – Prueba Posterior al Cierre', category: 'Procedimiento y Garantías' },
+        { path: 'minutas/N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 5 – Artículo 195 Ley 18.290', category: 'Delitos y Tipicidad' },
+        { path: 'minutas/N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 6 – Revisión de Celulares', category: 'Diligencias e Investigación' },
+        { path: 'minutas/N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 7 – Primeras Diligencias y GPS', category: 'Diligencias e Investigación' },
+        { path: 'minutas/N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 8 – Apelación Revocación de Pena Sustitutiva', category: 'Procedimiento y Garantías' },
+        { path: 'minutas/N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 9 – Control de Identidad en Investigación en Curso', category: 'Control de Identidad' },
+        { path: 'minutas/N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en Porte o Tenencia de Armas', category: 'Delitos y Tipicidad' },
+        { path: 'minutas/N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación Provisional', category: 'Procedimiento y Garantías' },
+        { path: 'minutas/N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: Declaración Previa', category: 'Procedimiento y Garantías' },
+        { path: 'minutas/N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de Identidad (Arrojar Objeto)', category: 'Control de Identidad' },
+        { path: 'minutas/N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por Videoconferencia', category: 'Procedimiento y Garantías' },
+        { path: 'minutas/N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de Identidad y Denuncia Anónima', category: 'Control de Identidad' }
+      ];
+    }`,
                   title: `Minuta Nº ${num} – ${fileName.replace(num+'_','')}`,
                   category: 'Minuta',
               };
