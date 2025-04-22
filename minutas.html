@@ -2,229 +2,187 @@
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
   <title>Biblioteca Jurídica – ANF</title>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
   <style>
-    :root { --primary:#1f334d;--accent-calc:#2a5d68;--accent-min:#8e44ad;--bg:#f5f7fa;--text:#333;--card-bg:#fff;--radius:12px;--shadow:0 2px 10px rgba(0,0,0,0.08); }
+    :root { --primary:#1f334d;--bg:#f5f7fa;--text:#333;--card-bg:#fff;--radius:12px;--shadow:0 2px 10px rgba(0,0,0,0.08); }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Ubuntu,sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
     header{background:var(--primary);color:#fff;padding:1rem;}
-    .title-bar{display:flex;align-items:center;}
-    .title-bar h1{flex:1;font-size:1.6rem;}
-    .search-bar{background:#fff;border-radius:50px;padding:0.5rem 1rem;display:flex;align-items:center;box-shadow:var(--shadow);margin-top:0.5rem;}
+    header h1{font-size:1.4rem;margin:0;}
+    .toolbar{display:flex;align-items:center;justify-content:space-between;background:#e8ebf0;padding:0.75rem;}
+    .search-bar{flex:1;display:flex;align-items:center;background:#fff;border-radius:50px;padding:0.5rem 1rem;box-shadow:var(--shadow);margin-right:1rem;}
     .search-bar .fa-magnifying-glass{margin-right:0.5rem;color:#666;}
     .search-bar input{flex:1;border:none;outline:none;font-size:1rem;background:transparent;}
-    .toolbar{display:flex;align-items:center;justify-content:space-between;background:#e8ebf0;padding:0.5rem 1rem;}
-    .btn{background:rgba(255,255,255,0.8);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);color:var(--primary);cursor:pointer;}
-    .btn.active{background:var(--primary);color:#fff;}
-    .container{flex:1;overflow-y:auto;padding:1rem;}
-    .doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
+    .view-btns button{background:rgba(255,255,255,0.8);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);color:var(--primary);margin-right:0.5rem;}
+    .view-btns button.active{background:var(--primary);color:#fff;}
+    select.cat-filter{padding:0.3rem 0.6rem;border:1px solid #ccc;border-radius:8px;font-size:0.9rem;}
+    main{flex:1;overflow-y:auto;padding:0.75rem;}
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;}
     .doc-list{display:flex;flex-direction:column;gap:0.5rem;}
-    .doc-item{background:var(--card-bg);border-radius:var(--radius);padding:0.75rem;display:flex;flex-direction:column;align-items:center;box-shadow:var(--shadow);border-top:4px solid var(--primary);cursor:pointer;}
-    .doc-list .doc-item{padding:0.5rem;}
-    .doc-icon{font-size:1.8rem;margin-bottom:0.5rem;}
-    .doc-title{font-weight:600;text-align:center;font-size:1rem;}
-    #viewer{display:none;flex:1;padding:1rem;background:#fff;overflow-y:auto;}
-    #doc-toolbar{display:none;align-items:center;gap:0.5rem;background:#e8ebf0;padding:0.5rem 1rem;}
-    #doc-toolbar .btn{margin-right:0.5rem;}
-    .search-results{display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.5rem;border-radius:50px;display:flex;align-items:center;gap:0.5rem;box-shadow:var(--shadow);}
+    .doc-item{background:var(--card-bg);border-radius:var(--radius);padding:1.25rem 0.75rem;display:flex;flex-direction:column;align-items:center;box-shadow:var(--shadow);border-top:4px solid var(--primary);cursor:pointer;}
+    .doc-icon{font-size:2rem;color:var(--primary);margin-bottom:0.75rem;}
+    .doc-title{font-weight:600;text-align:center;font-size:0.9rem;line-height:1.3;}
+    #minutas-viewer{display:none;background:#fff;padding:1rem;overflow-y:auto;}
+    .highlight{background:#ffe169;padding:0 2px;border-radius:2px;}
+    .search-results{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;display:flex;align-items:center;gap:0.5rem;padding:0.5rem;border-radius:50px;box-shadow:var(--shadow);display:none;}
     .search-results button{background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;}
   </style>
 </head>
 <body>
-  <header id="main-header">
-    <div class="title-bar">
-      <h1>Biblioteca Jurídica</h1>
-      <span id="doc-title-header"></span>
-    </div>
+  <header><h1>Minutas de Jurisprudencia</h1></header>
+  <div class="toolbar">
     <div class="search-bar">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input id="search" type="text" placeholder="Buscar..." />
+      <input id="minutas-search" type="text" placeholder="Buscar en minutas..."/>
     </div>
-  </header>
-  <div class="toolbar" id="view-toolbar">
-    <button class="btn active" id="grid-view-btn" title="Vista cuadrícula"><i class="fa-solid fa-table-cells"></i></button>
-    <button class="btn" id="list-view-btn" title="Vista lista"><i class="fa-solid fa-list"></i></button>
+    <div class="view-btns">
+      <button id="minutas-grid-btn" class="active" title="Vista en cuadrícula"><i class="fa-solid fa-table-cells"></i></button>
+      <button id="minutas-list-btn" title="Vista en lista"><i class="fa-solid fa-list"></i></button>
+    </div>
+    <select id="minutas-catFilter" class="cat-filter">
+      <option value="all">Todas las categorías</option>
+      <option value="Control de Identidad">Control de Identidad</option>
+      <option value="Detención y Aprehensión">Detención y Aprehensión</option>
+      <option value="Diligencias e Investigación inicial">Diligencias e Investigación inicial</option>
+      <option value="Evidencia y Cadena de Custodia">Evidencia y Cadena de Custodia</option>
+      <option value="Procedimiento y Garantías">Procedimiento y Garantías</option>
+      <option value="Delitos y Tipicidad">Delitos y Tipicidad</option>
+    </select>
   </div>
-  <div class="toolbar" id="doc-toolbar">
-    <button class="btn" id="btn-back" title="Volver"><i class="fa-solid fa-house"></i></button>
-    <button class="btn" id="btn-font-decrease" title="Reducir texto"><i class="fa-solid fa-minus"></i></button>
-    <button class="btn" id="btn-font-increase" title="Aumentar texto"><i class="fa-solid fa-plus"></i></button>
-  </div>
-  <div class="container" id="main-container">
-    <div class="doc-grid" id="docList"></div>
-    <div id="minutasList" style="display:none" class="doc-grid"></div>
-    <div id="viewer"></div>
-  </div>
-  <div class="search-results">
-    <button id="prev-result"><i class="fa-solid fa-chevron-up"></i></button>
-    <span id="result-counter">0 de 0</span>
-    <button id="next-result"><i class="fa-solid fa-chevron-down"></i></button>
-    <button id="close-search"><i class="fa-solid fa-xmark"></i></button>
+  <main>
+    <div id="minutas-docList" class="doc-grid"></div>
+    <div id="minutas-viewer"></div>
+  </main>
+  <div id="minutas-search-results" class="search-results">
+    <button id="minutas-prev"><i class="fa-solid fa-chevron-up"></i></button>
+    <span id="minutas-counter">0 de 0</span>
+    <button id="minutas-next"><i class="fa-solid fa-chevron-down"></i></button>
+    <button id="minutas-close"><i class="fa-solid fa-xmark"></i></button>
   </div>
   <script>
-    const docList = document.getElementById('docList');
-    const minList = document.getElementById('minutasList');
-    const viewer = document.getElementById('viewer');
-    const searchInput = document.getElementById('search');
-    const viewToolbar = document.getElementById('view-toolbar');
-    const docToolbar = document.getElementById('doc-toolbar');
-    const docTitleHeader = document.getElementById('doc-title-header');
-    const prevBtn = document.getElementById('prev-result');
-    const nextBtn = document.getElementById('next-result');
-    const closeBtn = document.querySelector('.search-results #close-search');
-    const counter = document.getElementById('result-counter');
-
+  (function(){
     const docs = [
-      { file: 'docs/documento1.html', title: 'CÓDIGO PENAL', icon: 'fa-solid fa-gavel' },
-      { file: 'docs/documento2.html', title: 'CÓDIGO PROCESAL PENAL', icon: 'fa-solid fa-scale-balanced' },
-      { file: 'docs/documento3.html', title: 'LEY DE DROGAS', icon: 'fa-solid fa-pills' },
-      { file: 'docs/documento4.html', title: 'LEY DE CONTROL DE ARMAS', icon: 'fa-solid fa-gun' },
-      { file: 'docs/documento5.html', title: 'LEY DE PENAS SUSTITUTIVAS', icon: 'fa-solid fa-person-walking-arrow-right' },
-      { file: 'docs/documento6.html', title: 'LEY DE VIOLENCIA INTRAFAMILIAR', icon: 'fa-solid fa-house-user' },
-      { file: 'docs/documento7.html', title: 'LEY RPA', icon: 'fa-solid fa-child' },
-      { file: 'docs/documento8.html', title: 'LEY RPA (Diferida)', icon: 'fa-solid fa-child-reaching' },
-      { file: 'docs/documento9.html', title: 'LEY DE VIOLENCIA EN ESTADIOS', icon: 'fa-solid fa-futbol' },
-      { file: 'docs/documento10.html', title: 'LEY DE TRÁNSITO', icon: 'fa-solid fa-car' },
-      { file: 'docs/documento11.html', title: 'LEY ORGÁNICA DEL MINISTERIO PÚBLICO', icon: 'fa-solid fa-building-columns' },
-      { file: 'docs/calculadora_abonos.html', title: 'Calculadora Abonos por Arresto', icon: 'fa-solid fa-calculator', type: 'calc' },
-      { title: 'Minutas de Jurisprudencia', icon: 'fa-solid fa-book-open', type: 'min' }
+      { path: 'docs/minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)' },
+      { path: 'docs/minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 03 – Acceso a información en Facebook' },
+      { path: 'docs/minutas/N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 04 – Prueba posterior al cierre de la investigación' },
+      { path: 'docs/minutas/N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 05 – Artículo 195 Ley 18.290 (Omisión de auxilio)' },
+      { path: 'docs/minutas/N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 06 – Revisión de teléfonos móviles incautados' },
+      { path: 'docs/minutas/N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 07 – Primeras diligencias y GPS' },
+      { path: 'docs/minutas/N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 08 – Efecto de la apelación de la revocación de pena sustitutiva' },
+      { path: 'docs/minutas/N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 09 – Control de identidad en investigación en curso' },
+      { path: 'docs/minutas/N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en porte o tenencia de armas' },
+      { path: 'docs/minutas/N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación provisional previa al informe psiquiátrico' },
+      { path: 'docs/minutas/N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: necesidad de declaración previa' },
+      { path: 'docs/minutas/N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de identidad (arrojar objeto)' },
+      { path: 'docs/minutas/N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por videoconferencia' },
+      { path: 'docs/minutas/N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de identidad y denuncia anónima' },
+      { path: 'docs/minutas/N°16__DETENCION_POR_GUARDIAS_DE_SEGURIDAD_O_MUNICIPALES.md', title: 'Minuta Nº 16 – Detención por guardias de seguridad o municipales' },
+      { path: 'docs/minutas/N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_O_FRUSTRADOS.md', title: 'Minuta Nº 17 – Dolo eventual y delitos tentados o frustrados' },
+      { path: 'docs/minutas/N°18_DETENCION_POR_PARTICULARES.md', title: 'Minuta Nº 18 – Detención por particulares' },
+      { path: 'docs/minutas/N°19_CONTROL_DE_IDENTIDAD_PREVENTIVO_QUE_MUTA_A_INVESTIGATIVO.md', title: 'Minuta Nº 19 – Control de identidad preventivo que muta a investigativo' },
+      { path: 'docs/minutas/N°20_CADENA_DE_CUSTODIA_Y_DEBIDO_PROCESO.md', title: 'Minuta Nº 20 – Cadena de custodia y debido proceso' },
+      { path: 'docs/minutas/N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title: 'Minuta Nº 21 – Control de identidad: olor a marihuana' },
+      { path: 'docs/minutas/N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title: 'Minuta Nº 22 – Control de identidad y huida' },
+      { path: 'docs/minutas/N°23_CONTROL_IDENTIDAD_Y_CAN_DETECTOR_DE_DROGAS.md', title: 'Minuta Nº 23 – Control de identidad y can detector de drogas' },
+      { path: 'docs/minutas/N°24_Reclamos_por_infracción_de_garantías_de_terceros.md', title: 'Minuta Nº 24 – Reclamos por infracción de garantías de terceros' },
+      { path: 'docs/minutas/N°25_Porte_o_tenencia_de_una_munición.md', title: 'Minuta Nº 25 – Porte o tenencia de una munición' },
+      { path: 'docs/minutas/N°26_Delito_continuado_-_reiterado.md', title: 'Minuta Nº 26 – Delito continuado / reiterado' },
+      { path: 'docs/minutas/N°27_Control_de_identidad_-_Transacción_en_la_vía_pública.md', title: 'Minuta Nº 27 – Control de identidad: transacción en la vía pública' },
+      { path: 'docs/minutas/N°28_Obligatoriedad_del_artículo_302_del_CPP_durante_la_etapa_investigativa.md', title: 'Minuta Nº 28 – Oblig. art. 302 CPP en etapa investigativa' },
+      { path: 'docs/minutas/N°29_Abuso_sexual_-_Introducción_de_dedos.md', title: 'Minuta Nº 29 – Abuso sexual: introducción de dedos' },
+      { path: 'docs/minutas/N°30_Actuaciones_autónomas_de_Carabineros_en_marchas_y_manifestaciones.md', title: 'Minuta Nº 30 – Actuaciones autónomas de Carabineros en marchas y manifestaciones' },
+      { path: 'docs/minutas/N°31_Retractación_Víctima_331_letra_f)_CPP.md', title: 'Minuta Nº 31 – Retractación de la víctima e incorporación de su declaración previa' },
+      { path: 'docs/minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'Minuta Nº 32 – Instrucción sobre primeras diligencias' }
     ];
-    let minutas = [];
-    let highlights = [], current = -1, lastTerm = '';
 
-    function buildDocList() {
-      docList.innerHTML = '';
-      docs.forEach(d => {
-        const card = document.createElement('div');
-        card.className = 'doc-item';
-        card.innerHTML = `<div class="doc-icon"><i class="${d.icon}"></i></div><div class="doc-title">${d.title}</div>`;
-        card.onclick = () => d.type === 'min' ? showMinutas() : openDoc(d.file, d.title);
-        docList.appendChild(card);
-      });
+    const list = document.getElementById('minutas-docList');
+    const viewerEl = document.getElementById('minutas-viewer');
+    const searchEl = document.getElementById('minutas-search');
+    const gridEl = document.getElementById('minutas-grid-btn');
+    const listElBtn = document.getElementById('minutas-list-btn');
+    const filterEl = document.getElementById('minutas-catFilter');
+    const prevEl = document.getElementById('minutas-prev');
+    const nextEl = document.getElementById('minutas-next');
+    const closeEl = document.getElementById('minutas-close');
+    const counterEl = document.getElementById('minutas-counter');
+
+    let highlights = [], currentHit = 0;
+
+    function render() {
+      list.innerHTML = '';
+      docs
+        .filter(d => filterEl.value==='all' || d.title.includes(filterEl.value))
+        .forEach(d => {
+          const card = document.createElement('div');
+          card.className = 'doc-item';
+          card.innerHTML = `<div class="doc-icon"><i class="fa-solid fa-file-lines"></i></div>
+                            <div class="doc-title">${d.title}</div>`;
+          card.onclick = () => openMinuta(d);
+          list.appendChild(card);
+        });
+      applyViewMode();
     }
 
-    async function loadMinutas() {
-      return [
-        { path: 'docs/minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'Minuta Nº 02 – Control de Identidad (Tránsito)' },
-        { path: 'docs/minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'Minuta Nº 03 – Acceso a información en Facebook' },
-        { path: 'docs/minutas/N°4_PRUEBA_POSTERIOR_AL_CIERRE.md', title: 'Minuta Nº 04 – Prueba posterior al cierre de la investigación' },
-        { path: 'docs/minutas/N°5_ARTICULO_195_LEY_18290.md', title: 'Minuta Nº 05 – Artículo 195 Ley 18.290 (Omisión de auxilio)' },
-        { path: 'docs/minutas/N°6_REVISIÓN_DE_CELULARES.md', title: 'Minuta Nº 06 – Revisión de teléfonos móviles incautados' },
-        { path: 'docs/minutas/N°7_PRIMERAS_DILIGENCIAS_Y_GPS.md', title: 'Minuta Nº 07 – Primeras diligencias y GPS' },
-        { path: 'docs/minutas/N°8_EFECTO_DE_LA_APELACIÓN_DE_LA_REVOCACIÓN_DE_PENA_SUSTITUTIVA.md', title: 'Minuta Nº 08 – Efecto de la apelación de la revocación de pena sustitutiva' },
-        { path: 'docs/minutas/N°9_CONTROL_DE_IDENTIDAD_EN_INVESTIGACIÓN_EN_CURSO.md', title: 'Minuta Nº 09 – Control de identidad en investigación en curso' },
-        { path: 'docs/minutas/N°10_COAUTORIA_EN_PORTE_O_TENENCIA_DE_ARMAS.md', title: 'Minuta Nº 10 – Coautoría en porte o tenencia de armas' },
-        { path: 'docs/minutas/N°11_INTERNACION_PROVISIONAL_PREVIA_AL_INFORME_SIQUIATRICO.md', title: 'Minuta Nº 11 – Internación provisional previa al informe psiquiátrico' },
-        { path: 'docs/minutas/N°12_TESTIGOS_NECESIDAD_DE_UNA_DECLARACIÓN_PREVIA.md', title: 'Minuta Nº 12 – Testigos: necesidad de declaración previa' },
-        { path: 'docs/minutas/N°13_CONTROL_DE_IDENTIDAD_(ARROJAR_OBJETO).md', title: 'Minuta Nº 13 – Control de identidad (arrojar objeto)' },
-        { path: 'docs/minutas/N°14_JUICIOS_POR_VIDEOCONFERENCIA_(RECLAMOS_CONCRETOS).md', title: 'Minuta Nº 14 – Juicios por videoconferencia' },
-        { path: 'docs/minutas/N°15_CONTROL_DE_IDENTIDAD_Y_DENUNCIA_ANÓNIMA.md', title: 'Minuta Nº 15 – Control de identidad y denuncia anónima' },
-        { path: 'docs/minutas/N°16__DETENCION_POR_GUARDIAS_DE_SEGURIDAD_O_MUNICIPALES.md', title: 'Minuta Nº 16 – Detención por guardias de seguridad o municipales' },
-        { path: 'docs/minutas/N°17_DOLO_EVENTUAL_Y_DELITOS_TENTADOS_O_FRUSTRADOS.md', title: 'Minuta Nº 17 – Dolo eventual y delitos tentados o frustrados' },
-        { path: 'docs/minutas/N°18_DETENCION_POR_PARTICULARES.md', title: 'Minuta Nº 18 – Detención por particulares' },
-        { path: 'docs/minutas/N°19_CONTROL_DE_IDENTIDAD_PREVENTIVO_QUE_MUTA_A_INVESTIGATIVO.md', title: 'Minuta Nº 19 – Control de identidad preventivo que muta a investigativo' },
-        { path: 'docs/minutas/N°20_CADENA_DE_CUSTODIA_Y_DEBIDO_PROCESO.md', title: 'Minuta Nº 20 – Cadena de custodia y debido proceso' },
-        { path: 'docs/minutas/N°21_CONTROL_IDENTIDAD_OLOR_MARIHUANA.md', title: 'Minuta Nº 21 – Control de identidad: olor a marihuana' },
-        { path: 'docs/minutas/N°22_CONTROL_IDENTIDAD_Y_HUIDA.md', title: 'Minuta Nº 22 – Control de identidad y huida' },
-        { path: 'docs/minutas/N°23_CONTROL_IDENTIDAD_Y_CAN_DETECTOR_DE_DROGAS.md', title: 'Minuta Nº 23 – Control de identidad y can detector de drogas' },
-        { path: 'docs/minutas/N°24_Reclamos_por_infracción_de_garantías_de_terceros.md', title: 'Minuta Nº 24 – Reclamos por infracción de garantías de terceros' },
-        { path: 'docs/minutas/N°25_Porte_o_tenencia_de_una_munición.md', title: 'Minuta Nº 25 – Porte o tenencia de una munición' },
-        { path: 'docs/minutas/N°26_Delito_continuado_-_reiterado.md', title: 'Minuta Nº 26 – Delito continuado / reiterado' },
-        { path: 'docs/minutas/N°26-Delito-continuado-reiterado_.md', title: 'Minuta Nº 26b – Delito continuado / reiterado (duplicado)' },
-        { path: 'docs/minutas/N°27_Control_de_identidad_-_Transacción_en_la_vía_pública.md', title: 'Minuta Nº 27 – Control de identidad: transacción en la vía pública' },
-        { path: 'docs/minutas/N°28_Obligatoriedad_del_artículo_302_del_CPP_durante_la_etapa_investigativa.md', title: 'Minuta Nº 28 – Oblig. art. 302 CPP en etapa investigativa' },
-        { path: 'docs/minutas/N°29_Abuso_sexual_-_Introducción_de_dedos.md', title: 'Minuta Nº 29 – Abuso sexual: introducción de dedos' },
-        { path: 'docs/minutas/N°30_Actuaciones_autónomas_de_Carabineros_en_marchas_y_manifestaciones.md', title: 'Minuta Nº 30 – Actuaciones autónomas de Carabineros en marchas y manifestaciones' },
-        { path: 'docs/minutas/N°31_Retractación_Víctima_331_letra_f)_CPP.md', title: 'Minuta Nº 31 – Retractación de la víctima e incorporación de su declaración previa' },
-        { path: 'docs/minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'Minuta Nº 32 – Instrucción sobre primeras diligencias' }
-      ];
-    },
-        { path: 'minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'N°3 - Acceso a info Facebook' },
-        { path: 'minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'N°32 - Primeras diligencias' }
-      ];
-    }
-
-    async function showMinutas() {
-      docList.style.display = 'none'; viewToolbar.style.display = 'none';
-      minList.style.display = 'grid'; minList.innerHTML = '<p>Cargando minutas...</p>';
-      if (!minutas.length) minutas = await loadMinutas();
-      renderMinutasList();
-    }
-
-    function renderMinutasList() {
-      minList.innerHTML = '';
-      minutas.forEach(m => {
-        const c = document.createElement('div');
-        c.className = 'doc-item';
-        c.innerHTML = `<div class="doc-icon"><i class="fa-solid fa-file-lines"></i></div><div class="doc-title">${m.title}</div>`;
-        c.onclick = () => openDoc(m.path, m.title);
-        minList.appendChild(c);
-      });
-    }
-
-    function openDoc(path, title) {
-      docList.style.display = 'none'; minList.style.display = 'none';
-      viewer.style.display = 'block'; viewToolbar.style.display = 'none';
-      docToolbar.style.display = 'flex'; docTitleHeader.textContent = title;
-      loadDocument(path);
-    }
-
-    async function loadDocument(path) {
-      viewer.innerHTML = '<p>Cargando...</p>';
+    async function openMinuta(d) {
+      list.style.display = 'none';
+      viewerEl.style.display = 'block';
+      viewerEl.innerHTML = '<p>Cargando...</p>';
       try {
-        const res = await fetch(path);
+        const res = await fetch(d.path);
         const txt = await res.text();
-        const html = path.endsWith('.md') ? marked.parse(txt) : txt;
-        viewer.innerHTML = html; viewer.dataset.original = html; highlightAll();
+        const html = marked.parse(txt);
+        viewerEl.innerHTML = html;
+        viewerEl.dataset.original = html;
+        if (window.hljs) hljs.highlightAll();
       } catch {
-        viewer.innerHTML = '<p>Error al cargar.</p>';
+        viewerEl.innerHTML = '<p>Error al cargar la minuta.</p>';
       }
     }
 
-    function highlightAll(){ if(window.hljs) hljs.highlightAll(); }
-
-    function changeFont(dir) {
-      const size = parseInt(getComputedStyle(viewer).fontSize) || 16;
-      const newSize = Math.min(24, Math.max(12, size + dir*2));
-      viewer.style.fontSize = newSize+'px';
+    function applyViewMode() {
+      list.className = gridEl.classList.contains('active') ? 'doc-grid' : 'doc-list';
     }
 
-    function resetSearch() {
-      highlights=[]; current=-1; lastTerm=''; document.querySelector('.search-results').style.display='none';
+    function searchInDoc() {
+      const term = searchEl.value.trim();
+      if (!term) return;
+      viewerEl.innerHTML = viewerEl.dataset.original;
+      const rx = new RegExp(`(${term})`, 'gi');
+      highlights = Array.from(viewerEl.innerHTML.matchAll(rx)).map(m => m[0]);
+      viewerEl.innerHTML = viewerEl.innerHTML.replace(rx, '<span class="highlight">$1</span>');
+      const elems = viewerEl.querySelectorAll('.highlight');
+      if (elems.length) {
+        currentHit = 0;
+        elems[currentHit].scrollIntoView({ behavior:'smooth', block:'center' });
+        counterEl.textContent = `${1} de ${elems.length}`;
+        document.getElementById('minutas-search-results').style.display = 'flex';
+      }
     }
 
-    function doSearch() {
-      const term = searchInput.value.trim();
-      if (!term) return resetSearch();
-      if (viewer.style.display==='block') {
-        if (term===lastTerm&&highlights.length) return scrollHit(current+1);
-        lastTerm=term; viewer.innerHTML=viewer.dataset.original;
-        const rx=new RegExp(`(${term})`,'gi'); const walker=document.createTreeWalker(viewer,NodeFilter.SHOW_TEXT); const nodes=[];
-        while(walker.nextNode()) nodes.push(walker.currentNode);
-        nodes.forEach(n=>{ const val=n.nodeValue; if(!rx.test(val)) return; let last=0; const frag=document.createDocumentFragment(); val.replace(rx,(m,p,off)=>{ if(off>last) frag.appendChild(document.createTextNode(val.slice(last,off))); const sp=document.createElement('span');sp.className='highlight';sp.textContent=m;frag.appendChild(sp); last=off+m.length; }); if(last<val.length)frag.appendChild(document.createTextNode(val.slice(last))); n.parentNode.replaceChild(frag,n);
-        }); highlights=Array.from(viewer.querySelectorAll('.highlight'));
-        if(highlights.length){ document.querySelector('.search-results').style.display='flex'; scrollHit(0);} }
+    prevEl.onclick = () => navigate(-1);
+    nextEl.onclick = () => navigate(1);
+    closeEl.onclick = () => { viewerEl.innerHTML = viewerEl.dataset.original; highlights = []; document.getElementById('minutas-search-results').style.display = 'none'; };
+
+    function navigate(dir) {
+      const elems = viewerEl.querySelectorAll('.highlight');
+      if (!elems.length) return;
+      currentHit = (currentHit + dir + elems.length) % elems.length;
+      elems[currentHit].scrollIntoView({ behavior:'smooth', block:'center' });
+      counterEl.textContent = `${currentHit+1} de ${elems.length}`;
     }
 
-    function scrollHit(idx){ current=(idx+highlights.length)%highlights.length; highlights[current].scrollIntoView({behavior:'smooth',block:'center'}); counter.textContent=`${current+1} de ${highlights.length}`; }
+    gridEl.onclick = () => { gridEl.classList.add('active'); listElBtn.classList.remove('active'); applyViewMode(); };
+    listElBtn.onclick = () => { listElBtn.classList.add('active'); gridEl.classList.remove('active'); applyViewMode(); };
+    filterEl.onchange = render;
+    searchEl.oninput = () => setTimeout(searchInDoc, 300);
 
-    function filterDocuments(term){ const lower=term.toLowerCase(); docList.style.display='grid'; Array.from(docList.children).forEach(c=>{ const t=c.querySelector('.doc-title').textContent.toLowerCase(); c.style.display=t.includes(lower)?'':'none'; }); }
-
-    document.getElementById('btn-back').onclick=()=>{ viewer.style.display='none'; docToolbar.style.display='none'; docList.style.display='grid'; viewToolbar.style.display='flex'; docTitleHeader.textContent=''; searchInput.value=''; resetSearch(); };
-    document.getElementById('btn-font-increase').onclick=()=>changeFont(1);
-    document.getElementById('btn-font-decrease').onclick=()=>changeFont(-1);
-    document.getElementById('grid-view-btn').onclick=()=>{ docList.className='doc-grid'; document.getElementById('grid-view-btn').classList.add('active'); document.getElementById('list-view-btn').classList.remove('active'); localStorage.setItem('viewMode','grid'); };
-    document.getElementById('list-view-btn').onclick=()=>{ docList.className='doc-list'; document.getElementById('list-view-btn').classList.add('active'); document.getElementById('grid-view-btn').classList.remove('active'); localStorage.setItem('viewMode','list'); };
-    prevBtn.onclick=()=>scrollHit(current-1);
-    nextBtn.onclick=()=>scrollHit(current+1);
-    closeBtn.onclick=()=>{ searchInput.value=''; resetSearch(); viewer.innerHTML=viewer.dataset.original; };
-    searchInput.addEventListener('input',()=>{ clearTimeout(searchInput._t); searchInput._t=setTimeout(()=>{ if(viewer.style.display==='block')doSearch(); else filterDocuments(searchInput.value); },300); });
-    document.addEventListener('DOMContentLoaded',()=>{ buildDocList(); const v=localStorage.getItem('viewMode'); if(v==='list')document.getElementById('list-view-btn').click(); });
+    document.addEventListener('DOMContentLoaded', render);
+  })();
   </script>
 </body>
 </html>
