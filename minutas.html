@@ -113,14 +113,15 @@
     let appState = 'home'; // Puede ser 'home' o 'viewer'
 
     async function fetchDocumentList() {
+      let response = await fetch('/list_project_files');
+        const data = await response.json();
+        const files = data.result;
+        const filteredFiles = files.filter(file => file.startsWith('minutas/') && file.endsWith('.md'));
       try {
-          const response = await fetch('/list_project_files');
-          const data = await response.json();
-          const files = data.result;
-          docs = files.filter(file => file.startsWith('minutas/') && file.endsWith('.md')).map(file => {
+          docs = filteredFiles.map(file => {
             const fileName = file.split('/').pop().replace('.md','');
             const num = fileName.split('_')[0];
-              return {
+            return {
                   path: `${file}`,
                   title: `Minuta Nº ${num} – ${fileName.replace(num+'_','')}`,
                   category: 'Minuta',
@@ -133,10 +134,10 @@
     }
 
     // Renderiza las tarjetas de documentos
-    async function renderDocuments() {
+    function renderDocuments() {
       docListEl.innerHTML = '';
       const selectedCategory = filterEl.value;
-      await fetchDocumentList();
+      fetchDocumentList();
       const filteredDocs = docs
 
       // Si no hay documentos, mostrar mensaje
