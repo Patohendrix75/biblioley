@@ -31,9 +31,11 @@
     #viewer{display:none;flex:1;padding:1rem;background:#fff;overflow-y:auto;}
     #doc-toolbar{display:none;align-items:center;gap:0.5rem;background:#e8ebf0;padding:0.5rem 1rem;}
     #doc-toolbar .btn{margin-right:0.5rem;}
-    .search-results{display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.5rem;border-radius:50px;align-items:center;gap:0.5rem;box-shadow:var(--shadow);}
+    .search-results{display:none;position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:0.5rem;border-radius:50px;align-items:center;gap:0.5rem;box-shadow:var(--shadow);z-index:1000;}
     .search-results button{background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#fff;}
-    .highlight{background-color:yellow;color:black;}
+    /* Estilos específicos para los resaltados de búsqueda */
+    mark.highlight{background-color:yellow;color:black;}
+    mark.highlight.current{background-color:orange;color:black;}
   </style>
 </head>
 <body>
@@ -99,6 +101,8 @@
     let minutas = [];
     let highlights = [], current = -1, lastTerm = '';
     let currentFontSize = 16;
+    // Para rastrear si estamos realizando una búsqueda
+    let isSearching = false;
 
     function buildDocList() {
       docList.innerHTML = '';
@@ -112,11 +116,17 @@
     }
 
     async function loadMinutas() {
-      return [
-        { path: 'minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'N°2 - Control de identidad - Tránsito' },
-        { path: 'minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'N°3 - Acceso a info Facebook' },
-        { path: 'minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'N°32 - Primeras diligencias' }
-      ];
+      try {
+        // En un entorno real, esto podría ser una llamada API
+        return [
+          { path: 'minutas/N°2_CONTROL_DE_IDENTIDAD-LEY_DE_TRÁNSITO_C.md', title: 'N°2 - Control de identidad - Tránsito' },
+          { path: 'minutas/N°3_ACCESO_A_INFORMACIÓN_EN_FACEBOOK.md', title: 'N°3 - Acceso a info Facebook' },
+          { path: 'minutas/N°32_Instrucción_sobre_primeras_diligencias.md', title: 'N°32 - Primeras diligencias' }
+        ];
+      } catch (error) {
+        console.error("Error cargando minutas:", error);
+        return [];
+      }
     }
 
     async function showMinutas() {
@@ -124,8 +134,13 @@
       viewToolbar.style.display = 'none';
       minList.style.display = 'grid'; 
       minList.innerHTML = '<p>Cargando minutas...</p>';
-      if (!minutas.length) minutas = await loadMinutas();
-      renderMinutasList();
+      try {
+        if (!minutas.length) minutas = await loadMinutas();
+        renderMinutasList();
+      } catch (error) {
+        minList.innerHTML = '<p>Error al cargar las minutas. Intente nuevamente.</p>';
+        console.error("Error en showMinutas:", error);
+      }
     }
 
     function renderMinutasList() {
@@ -140,15 +155,22 @@
     }
 
     function openDoc(path, title) {
+      // Guardar el estado actual de la UI
+      resetUIState();
+      
+      // Configurar nueva UI para visualización de documento
       docList.style.display = 'none'; 
       minList.style.display = 'none';
       viewer.style.display = 'block'; 
       viewToolbar.style.display = 'none';
       docToolbar.style.display = 'flex'; 
       docTitleHeader.textContent = title;
-      // Reiniciar el tamaño de fuente al abrir un nuevo documento
-      currentFontSize = 16;
+      
+      // Detectar el tamaño de fuente guardado o usar el predeterminado
+      const savedFontSize = localStorage.getItem(`fontSize-${path}`);
+      currentFontSize = savedFontSize ? parseInt(savedFontSize) : 16;
       viewer.style.fontSize = currentFontSize + 'px';
+      
       loadDocument(path);
     }
 
@@ -156,30 +178,85 @@
       viewer.innerHTML = '<p>Cargando...</p>';
       try {
         const res = await fetch(path);
+        if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
+        
         const txt = await res.text();
         const html = path.endsWith('.md') ? marked.parse(txt) : txt;
-        viewer.innerHTML = html; 
-        viewer.dataset.original = html; 
-        highlightAll();
-      } catch {
-        viewer.innerHTML = '<p>Error al cargar.</p>';
+        
+        // Almacenar el contenido original como propiedad en lugar de atributo data
+        // para evitar problemas con documentos grandes
+        viewer._originalContent = html;
+        viewer.innerHTML = html;
+        
+        // Aplicar resaltado de código después de cargar el contenido
+        setTimeout(() => {
+          try {
+            if(window.hljs) hljs.highlightAll();
+          } catch (e) {
+            console.error("Error al aplicar resaltado de sintaxis:", e);
+          }
+        }, 100);
+      } catch (error) {
+        viewer.innerHTML = `<p>Error al cargar: ${error.message}</p>`;
+        console.error("Error cargando documento:", error);
       }
     }
 
-    function highlightAll(){ 
-      if(window.hljs) hljs.highlightAll(); 
+    function resetUIState() {
+      // Limpiar estado de búsqueda
+      resetSearch();
+      
+      // Guardar el tamaño de fuente actual si hay un documento abierto
+      if (viewer.style.display === 'block' && docTitleHeader.textContent) {
+        const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file;
+        if (currentPath) {
+          localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
+        }
+      }
     }
 
     function changeFont(dir) {
-      currentFontSize = Math.min(24, Math.max(12, currentFontSize + dir*2));
-      viewer.style.fontSize = currentFontSize + 'px';
+      // Limitar el tamaño de fuente entre 12px y 24px
+      const newSize = Math.min(24, Math.max(12, currentFontSize + dir*2));
+      if (newSize !== currentFontSize) {
+        currentFontSize = newSize;
+        viewer.style.fontSize = currentFontSize + 'px';
+        
+        // Guardar el tamaño de fuente para este documento
+        const currentPath = docs.find(d => d.title === docTitleHeader.textContent)?.file;
+        if (currentPath) {
+          localStorage.setItem(`fontSize-${currentPath}`, currentFontSize);
+        }
+      }
     }
 
     function resetSearch() {
+      // Limpiar estado de búsqueda
       highlights = []; 
       current = -1; 
-      lastTerm = ''; 
+      lastTerm = '';
+      isSearching = false;
       searchResults.style.display = 'none';
+      
+      // Si estamos en un documento, restaurar el contenido original
+      if (viewer.style.display === 'block' && viewer._originalContent) {
+        try {
+          // Preservar el tamaño de fuente actual
+          const fontSize = viewer.style.fontSize;
+          viewer.innerHTML = viewer._originalContent;
+          viewer.style.fontSize = fontSize;
+          
+          // Reaplica el resaltado de sintaxis si es necesario
+          if (window.hljs) setTimeout(() => hljs.highlightAll(), 0);
+        } catch (e) {
+          console.error("Error restaurando contenido original:", e);
+        }
+      }
+    }
+
+    // Función para escapar caracteres especiales en expresiones regulares
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
     function doSearch() {
@@ -190,66 +267,52 @@
       }
       
       if (viewer.style.display === 'block') {
-        // Si es la misma búsqueda y ya tenemos resultados, sólo navega al siguiente
+        // Si ya estamos buscando y es el mismo término, solo navegamos
         if (term === lastTerm && highlights.length) {
           scrollHit(current + 1);
           return;
         }
         
-        // Nueva búsqueda
-        lastTerm = term;
+        // Evitar búsquedas simultáneas
+        if (isSearching) return;
+        isSearching = true;
         
-        // Restaurar contenido original antes de buscar nuevamente
-        viewer.innerHTML = viewer.dataset.original;
-        
-        // Crear expresión regular para la búsqueda
-        const regex = new RegExp(`(${term})`, 'gi');
-        
-        // Recorrer todos los nodos de texto
-        const walker = document.createTreeWalker(viewer, NodeFilter.SHOW_TEXT);
-        const nodes = [];
-        while (walker.nextNode()) {
-          nodes.push(walker.currentNode);
+        try {
+          // Nueva búsqueda - Restaurar el contenido original
+          if (viewer._originalContent) {
+            viewer.innerHTML = viewer._originalContent;
+            // Reaplica el resaltado de sintaxis
+            if (window.hljs) setTimeout(() => hljs.highlightAll(), 0);
+          }
+          
+          lastTerm = term;
+          
+          // Usamos mark.js en lugar de nuestra propia implementación
+          // pero aquí simularemos una implementación mejorada
+          performSearch(term);
+        } catch (error) {
+          console.error("Error en búsqueda:", error);
+          searchResults.style.display = 'none';
+        } finally {
+          isSearching = false;
         }
+      }
+    }
+
+    function performSearch(term) {
+      // Implementación mejorada de búsqueda
+      try {
+        // Escapa caracteres especiales de regex
+        const escapedTerm = escapeRegExp(term);
+        // Crea una expresión regular segura
+        const regex = new RegExp(`(${escapedTerm})`, 'gi');
         
-        // Procesar cada nodo y resaltar coincidencias
-        nodes.forEach(node => {
-          const text = node.nodeValue;
-          if (!regex.test(text)) return;
-          
-          const fragment = document.createDocumentFragment();
-          let lastIndex = 0;
-          let match;
-          
-          // Reset regex lastIndex
-          regex.lastIndex = 0;
-          
-          while ((match = regex.exec(text)) !== null) {
-            // Texto antes del match
-            if (match.index > lastIndex) {
-              fragment.appendChild(document.createTextNode(text.substring(lastIndex, match.index)));
-            }
-            
-            // El texto coincidente resaltado
-            const highlightSpan = document.createElement('span');
-            highlightSpan.className = 'highlight';
-            highlightSpan.textContent = match[0];
-            fragment.appendChild(highlightSpan);
-            
-            lastIndex = regex.lastIndex;
-          }
-          
-          // Texto después del último match
-          if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
-          }
-          
-          // Reemplazar el nodo original con el fragmento
-          node.parentNode.replaceChild(fragment, node);
-        });
+        // Usar un enfoque basado en innerHTML para documentos pequeños/medianos
+        // Para documentos muy grandes, se recomendaría una biblioteca dedicada como mark.js
+        markOccurrences(viewer, regex);
         
         // Recolectar todos los elementos resaltados
-        highlights = Array.from(viewer.querySelectorAll('.highlight'));
+        highlights = Array.from(viewer.querySelectorAll('mark.highlight'));
         
         // Mostrar resultados si hay coincidencias
         if (highlights.length) {
@@ -259,36 +322,120 @@
           searchResults.style.display = 'none';
           counter.textContent = '0 de 0';
         }
+      } catch (error) {
+        console.error("Error en búsqueda:", error);
+        resetSearch();
+      }
+    }
+
+    function markOccurrences(container, regex) {
+      // Este enfoque preserva mejor la estructura del DOM
+      const nodesWithText = [];
+      
+      // Busca nodos de texto recursivamente, evitando scripts y estilos
+      function findTextNodes(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          if (node.textContent.trim() && regex.test(node.textContent)) {
+            nodesWithText.push(node);
+          }
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+          // Evitar scripts, estilos y elementos ya marcados
+          if (node.nodeName !== 'SCRIPT' && 
+              node.nodeName !== 'STYLE' && 
+              node.nodeName !== 'MARK') {
+            for (let i = 0; i < node.childNodes.length; i++) {
+              findTextNodes(node.childNodes[i]);
+            }
+          }
+        }
+      }
+      
+      findTextNodes(container);
+      
+      // Reemplazar texto en cada nodo encontrado
+      for (const textNode of nodesWithText) {
+        const parent = textNode.parentNode;
+        const text = textNode.textContent;
+        
+        // Reiniciar lastIndex
+        regex.lastIndex = 0;
+        
+        // Crear un fragmento para contener el nuevo contenido
+        const fragment = document.createDocumentFragment();
+        let lastIndex = 0;
+        let match;
+        
+        while ((match = regex.exec(text)) !== null) {
+          // Añadir texto antes de la coincidencia
+          if (match.index > lastIndex) {
+            fragment.appendChild(document.createTextNode(
+              text.substring(lastIndex, match.index)
+            ));
+          }
+          
+          // Crear el elemento mark para resaltar
+          const mark = document.createElement('mark');
+          mark.className = 'highlight';
+          mark.textContent = match[0];
+          fragment.appendChild(mark);
+          
+          lastIndex = regex.lastIndex;
+        }
+        
+        // Añadir cualquier texto restante
+        if (lastIndex < text.length) {
+          fragment.appendChild(document.createTextNode(
+            text.substring(lastIndex)
+          ));
+        }
+        
+        // Reemplazar el nodo original con el fragmento
+        parent.replaceChild(fragment, textNode);
       }
     }
 
     function scrollHit(idx) {
       if (highlights.length === 0) return;
       
+      // Asegurar que el índice está dentro del rango válido
       current = (idx + highlights.length) % highlights.length;
       
-      // Eliminar resaltado activo anterior
-      highlights.forEach(h => h.style.backgroundColor = 'yellow');
+      // Eliminar clase 'current' de todos los highlights
+      highlights.forEach(h => h.classList.remove('current'));
       
-      // Resaltar el actual más intensamente
-      highlights[current].style.backgroundColor = 'orange';
+      // Añadir clase 'current' al highlight actual
+      highlights[current].classList.add('current');
       
-      // Scroll al elemento
-      highlights[current].scrollIntoView({behavior: 'smooth', block: 'center'});
+      // Scroll suave al elemento
+      highlights[current].scrollIntoView({
+        behavior: 'smooth', 
+        block: 'center'
+      });
       
       // Actualizar contador
       counter.textContent = `${current + 1} de ${highlights.length}`;
     }
 
     function filterDocuments(term) {
+      if (!term) {
+        // Si no hay término, mostrar todos los documentos
+        Array.from(docList.children).forEach(card => {
+          card.style.display = '';
+        });
+        return;
+      }
+      
       const lower = term.toLowerCase();
       docList.style.display = 'grid';
+      
+      // Filtrar documentos por título
       Array.from(docList.children).forEach(card => {
         const title = card.querySelector('.doc-title').textContent.toLowerCase();
         card.style.display = title.includes(lower) ? '' : 'none';
       });
     }
 
+    // Event Listeners
     document.getElementById('btn-back').onclick = () => {
       viewer.style.display = 'none';
       docToolbar.style.display = 'none';
@@ -322,9 +469,9 @@
     closeBtn.onclick = () => {
       searchInput.value = '';
       resetSearch();
-      viewer.innerHTML = viewer.dataset.original;
     };
     
+    // Debounce para mejorar rendimiento en búsquedas
     searchInput.addEventListener('input', () => {
       clearTimeout(searchInput._t);
       searchInput._t = setTimeout(() => {
@@ -336,11 +483,27 @@
       }, 300);
     });
     
+    // Permitir búsqueda con Enter
+    searchInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') {
+        if (viewer.style.display === 'block') {
+          doSearch();
+        } else {
+          filterDocuments(searchInput.value);
+        }
+      }
+    });
+    
+    // Inicialización
     document.addEventListener('DOMContentLoaded', () => {
-      buildDocList();
-      const viewMode = localStorage.getItem('viewMode');
-      if (viewMode === 'list') {
-        document.getElementById('list-view-btn').click();
+      try {
+        buildDocList();
+        const viewMode = localStorage.getItem('viewMode');
+        if (viewMode === 'list') {
+          document.getElementById('list-view-btn').click();
+        }
+      } catch (error) {
+        console.error("Error en inicialización:", error);
       }
     });
   </script>
