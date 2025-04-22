@@ -2,18 +2,16 @@ MINUTA DE APOYO JURISPRUDENCIAL
 
 N°2 MAYO 2018
 
-CONTROL DE IDENTIDAD CON MOTIVO DE INFRACCIÓN A LA LEY DE TRÁNSITO O
-CONTROL VEHICULAR 
+**CONTROL DE IDENTIDAD CON MOTIVO DE INFRACCIÓN A LA LEY DE TRÁNSITO O
+CONTROL VEHICULAR** 
 
-CUESTIÓN JURÍDICA: Procedencia de la realización de un
+**CUESTIÓN JURÍDICA**: Procedencia de la realización de un
 control de identidad del artículo 85 del Código Procesal Penal, con
 motivo de la fiscalización por infracción a la Ley N° 18.290 de
 Tránsito.
 
-POSICIÓN DEL MINISTERIO PÚBLICO: El artículo 85 del Código Procesal
-Penal establece que "Los funcionarios
-
-policiales señalados en el artículo 83 deberán, además, sin orden previa
+**POSICIÓN DEL MINISTERIO PÚBLICO**: El artículo 85 del Código Procesal
+Penal establece que "Los funcionarios policiales señalados en el artículo 83 deberán, además, sin orden previa
 de los fiscales, solicitar la identificación de cualquier persona en los
 casos fundados, en que, según las circunstancias, estimaren que exista
 algún indicio de que ella hubiere cometido o intentado cometer un
@@ -26,7 +24,7 @@ encuentran habilitados, dentro del marco del control de identidad, para
 realizar un registro de las vestimentas, del equipaje o del vehículo que conduce la
 persona que es objeto del control.
 
-REFERENCIAS JURISPRUDENCIALES: 
+**REFERENCIAS JURISPRUDENCIALES:** 
 
 Corte Suprema Rol N°22.199-16
 (1-6-2016)
@@ -48,6 +46,7 @@ adicional de la posible comisión de un delito, la falta de conducir sin
 licencia, antecedentes que unidos a la información proporcionada al plan
 cuadrante, ciertamente son señales de una probable acción ilícita.".
 
+
 Corte Suprema Rol N°83.390-16
 (12-12-2016)
 "Noveno: Que en el caso en estudio la policía actuó, según se demostró,
@@ -64,6 +63,7 @@ falaz en cuanto al mal estado del automóvil. Dicho contexto constituye
 las circunstancias indiciarias para proceder del modo que indica el
 artículo 85 del Código Procesal Penal, lo que la sentencia expresamente
 así declaró en el fundamento octavo.". 
+
 
 Corte Suprema Rol N°37.208-17
 (21-12-2017)
@@ -86,6 +86,7 @@ identidad, quienes al ser informados que se les iba a efectuar un
 registro, intentaron descargarse de algo que portaban, por lo que fueron
 reducidos, encontrando al acusado LLancaleo Llancaleo una pistola con su
 respectivo cargador y once municiones.". 
+
 
 Corte Suprema Rol N°43.676-17 
 (12-02-2018)
