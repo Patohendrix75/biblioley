@@ -119,14 +119,15 @@
           const files = data.result;
           docs = files.filter(file => file.startsWith('minutas/') && file.endsWith('.md')).map(file => {
             const fileName = file.split('/').pop().replace('.md','');
+            const num = fileName.split('_')[0];
               return {
-                  path: `docs/${file}`,
-                  title: `Minuta Nº ${fileName}`,
+                  path: `${file}`,
+                  title: `Minuta Nº ${num} – ${fileName.replace(num+'_','')}`,
                   category: 'Minuta',
               };
           });
       } catch (error) {
-        console.error('Error fetching document list:', error);
+        console.error('Error al obtener la lista de documentos:', error);
         docs = [];
     }
     }
