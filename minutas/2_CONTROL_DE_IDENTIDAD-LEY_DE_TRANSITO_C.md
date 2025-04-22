@@ -85,8 +85,10 @@ provenían y hacia donde se dirigían, así como a proporcionar su
 identidad, quienes al ser informados que se les iba a efectuar un
 registro, intentaron descargarse de algo que portaban, por lo que fueron
 reducidos, encontrando al acusado LLancaleo Llancaleo una pistola con su
-respectivo cargador y once municiones.". Corte Suprema Rol N°43.676-17 (12-02-2018)
+respectivo cargador y once municiones.". 
 
+Corte Suprema Rol N°43.676-17 
+(12-02-2018)
 "Cuarto: Que, en ese orden, conforme a lo reproducido at supra, el fallo
 tuvo por cierto que los funcionarios policiales observan un vehículo que
 circula sin sus dos placas patentes -ni parachoques, como fue señalado
